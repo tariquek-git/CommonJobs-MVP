@@ -1,11 +1,19 @@
 import { getEnv } from './env.js';
 
-export function getCorsHeaders(request: Request): Record<string, string> {
+function getHeader(request: Request | { headers: Record<string, string | string[] | undefined> }, name: string): string {
+  if ('get' in request.headers && typeof request.headers.get === 'function') {
+    return request.headers.get(name) || '';
+  }
+  const val = (request.headers as Record<string, string | string[] | undefined>)[name];
+  return (Array.isArray(val) ? val[0] : val) || '';
+}
+
+export function getCorsHeaders(request: Request | { headers: Record<string, string | string[] | undefined> }): Record<string, string> {
   const origins = getEnv('CLIENT_ORIGIN', 'http://localhost:5173')
     .split(',')
     .map((o) => o.trim());
 
-  const requestOrigin = request.headers.get('origin') || '';
+  const requestOrigin = getHeader(request, 'origin');
   const allowedOrigin = origins.includes(requestOrigin) ? requestOrigin : origins[0];
 
   return {

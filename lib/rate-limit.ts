@@ -21,14 +21,20 @@ setInterval(() => {
   }
 }, 60 * 1000);
 
-export function getClientIP(request: Request): string {
-  // Use server-derived IP, not raw x-forwarded-for
-  // In Vercel, the platform sets x-real-ip reliably
-  const realIP = request.headers.get('x-real-ip');
+export function getClientIP(request: Request | { headers: Record<string, string | string[] | undefined> }): string {
+  // Support both Web API Request (headers.get) and Node/Vercel IncomingMessage (headers object)
+  const getHeader = (name: string): string | undefined => {
+    if ('get' in request.headers && typeof request.headers.get === 'function') {
+      return request.headers.get(name) ?? undefined;
+    }
+    const val = (request.headers as Record<string, string | string[] | undefined>)[name];
+    return Array.isArray(val) ? val[0] : val;
+  };
+
+  const realIP = getHeader('x-real-ip');
   if (realIP) return realIP;
 
-  // Fallback: take only the first IP from x-forwarded-for (client IP)
-  const forwarded = request.headers.get('x-forwarded-for');
+  const forwarded = getHeader('x-forwarded-for');
   if (forwarded) {
     const first = forwarded.split(',')[0]?.trim();
     if (first) return first;

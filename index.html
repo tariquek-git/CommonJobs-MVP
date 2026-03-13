@@ -20,17 +20,8 @@
     <meta name="twitter:title" content="Fintech Commons — Fintech Jobs, Humanized" />
     <meta name="twitter:description" content="Community-reviewed fintech & banking roles. Real talk about the job, not corporate fluff." />
     <meta name="twitter:image" content="/og-image.svg" />
-    <script>
-      // Prevent flash of wrong theme
-      (function() {
-        const theme = localStorage.getItem('theme');
-        if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-          document.documentElement.classList.add('dark');
-        }
-      })();
-    </script>
   </head>
-  <body class="bg-gray-50 text-gray-900 dark:bg-navy-950 dark:text-gray-100 antialiased">
+  <body class="bg-gray-50 text-gray-900 antialiased">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

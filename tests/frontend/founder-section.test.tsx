@@ -36,9 +36,12 @@ describe('FounderSection', () => {
     expect(screen.queryByText(/Job boards were built/)).not.toBeInTheDocument();
   });
 
-  it('renders Community Board explanation', () => {
+  it('renders How it works explainer', () => {
     render(<FounderSection />);
-    expect(screen.getByText('Community Board')).toBeInTheDocument();
+    expect(screen.getByText('How it works')).toBeInTheDocument();
+    expect(screen.getByText('A real person posts a role')).toBeInTheDocument();
+    expect(screen.getByText('Human-reviewed, not algorithm-sorted')).toBeInTheDocument();
+    expect(screen.getByText('Apply direct, or ask for a warm intro')).toBeInTheDocument();
   });
 
   it('renders please note box', () => {

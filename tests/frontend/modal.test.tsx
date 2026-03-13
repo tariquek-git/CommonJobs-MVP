@@ -25,6 +25,7 @@ const mockJob: Job = {
   submitter_email: null,
   tags: ['fintech', 'remote'],
   standout_perks: [],
+  warm_intro_ok: true,
   expires_at: null,
 };
 
@@ -39,7 +40,7 @@ describe('JobDetailModal', () => {
     expect(screen.getByText('Senior Engineer')).toBeInTheDocument();
     expect(screen.getByText('TestCo')).toBeInTheDocument();
     expect(screen.getByText('A great role')).toBeInTheDocument();
-    expect(screen.getByText('Apply Now')).toBeInTheDocument();
+    expect(screen.getByText('Apply Directly')).toBeInTheDocument();
   });
 
   it('calls onClose when Escape is pressed', () => {

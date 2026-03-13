@@ -55,6 +55,7 @@ export default function SubmitForm() {
     submitter_name: '',
     submitter_email: '',
     standout_perks: [],
+    warm_intro_ok: true,
   });
   const [perkInput, setPerkInput] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -161,8 +162,9 @@ export default function SubmitForm() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Submitted!</h2>
-        <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">{result.message}</p>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">You're in the queue</h2>
+        <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">{result.message}</p>
+        <p className="text-gray-400 dark:text-gray-500 text-xs mb-4">I'll personally review this and get it live as soon as I can. No bots here.</p>
         <div className="surface-tinted p-4 inline-block rounded-xl">
           <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">Reference ID</p>
           <p className="text-lg font-mono font-bold text-accent-600 dark:text-accent-400">{result.ref}</p>
@@ -175,6 +177,7 @@ export default function SubmitForm() {
               title: '', company: '', location: '', country: '',
               description: '', summary: '', apply_url: '', company_url: '',
               tags: [], submitter_name: '', submitter_email: '', standout_perks: [],
+              warm_intro_ok: true,
             });
           }}
           className="btn-secondary mt-6 block mx-auto"
@@ -202,6 +205,25 @@ export default function SubmitForm() {
         {step === 0 && (
           <div className="space-y-5">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">Job Details</h3>
+
+            {/* Scout's honour callout */}
+            <div className="rounded-xl bg-accent-50/50 dark:bg-accent-900/10 border border-accent-200/40 dark:border-accent-800/20 p-4">
+              <div className="flex gap-3">
+                <div className="shrink-0 mt-0.5">
+                  <svg className="h-5 w-5 text-accent-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-accent-700 dark:text-accent-400 mb-0.5">Scout's honour</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Every role posted here is personally reviewed before it goes live.
+                    No spam, no ghost listings, no roles that expired three months ago.
+                    If it's on the board, it's real.
+                  </p>
+                </div>
+              </div>
+            </div>
 
             {/* URL Auto-fill */}
             <div>
@@ -382,18 +404,65 @@ export default function SubmitForm() {
               </div>
             </div>
 
-            {/* Submitter contact */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Your Name</label>
-                <input type="text" value={form.submitter_name || ''} onChange={(e) => updateField('submitter_name', e.target.value)} className="input-field" placeholder="Jane Doe" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Your Email</label>
-                <input type="email" value={form.submitter_email} onChange={(e) => updateField('submitter_email', e.target.value)} className="input-field" placeholder="you@email.com" />
+            {/* Warm intro opt-in */}
+            <div className="rounded-xl bg-accent-50/50 dark:bg-accent-900/10 border border-accent-200/40 dark:border-accent-800/20 p-4">
+              <div className="flex items-start gap-3">
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={form.warm_intro_ok}
+                  onClick={() => setForm((prev) => ({ ...prev, warm_intro_ok: !prev.warm_intro_ok }))}
+                  className={`shrink-0 mt-0.5 relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    form.warm_intro_ok ? 'bg-accent-500' : 'bg-gray-300 dark:bg-navy-600'
+                  }`}
+                >
+                  <span className={`inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${
+                    form.warm_intro_ok ? 'translate-x-6' : 'translate-x-1'
+                  }`} />
+                </button>
+                <div>
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Allow warm intros for this role</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed mt-0.5">
+                    Candidates can request a warm intro through me. When they do, I'll send you an email with their info so you can connect directly.
+                  </p>
+                  {form.warm_intro_ok && (
+                    <div className="mt-3 rounded-lg bg-white/60 dark:bg-navy-900/40 border border-accent-200/40 dark:border-accent-800/20 p-3">
+                      <div className="flex gap-2">
+                        <svg className="h-4 w-4 text-accent-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p className="text-xs text-accent-700 dark:text-accent-400 leading-relaxed">
+                          <span className="font-semibold">Scout's honour:</span> By opting in, you're committing to take a look when someone's info lands in your inbox. You don't have to hire them — just engage in good faith. That's what makes this work.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-            <p className="text-xs text-gray-400 dark:text-gray-500 -mt-3">So we can notify you when it goes live and facilitate warm intros. Never shared publicly.</p>
+
+            {/* Submitter contact */}
+            <div className="rounded-xl bg-gray-50 dark:bg-navy-900/40 border border-gray-200/60 dark:border-navy-700/30 p-4 space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <svg className="h-4 w-4 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">A bit about you</p>
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed -mt-1">
+                So I can let you know when it's live and connect candidates who want a warm intro. Never shared publicly.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Your Name</label>
+                  <input type="text" value={form.submitter_name || ''} onChange={(e) => updateField('submitter_name', e.target.value)} className="input-field" placeholder="Jane Doe" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Your Email</label>
+                  <input type="email" value={form.submitter_email} onChange={(e) => updateField('submitter_email', e.target.value)} className="input-field" placeholder="you@email.com" />
+                </div>
+              </div>
+            </div>
 
             {/* Honeypot */}
             <div className="absolute -left-[9999px]" aria-hidden="true">

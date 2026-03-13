@@ -25,6 +25,7 @@ export interface Job {
   submitter_email: string | null;
   tags: string[];
   standout_perks: string[];
+  warm_intro_ok: boolean;
   expires_at: string | null;
 }
 
@@ -62,6 +63,7 @@ export interface SubmissionPayload {
   company_url?: string;
   tags?: string[];
   standout_perks?: string[];
+  warm_intro_ok?: boolean;
   submitter_name?: string;
   submitter_email?: string;
   // Honeypot - should be empty

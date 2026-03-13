@@ -8,3 +8,8 @@ dist/
 .DS_Store
 coverage/
 .vercel
+tsconfig.tsbuildinfo
+tsconfig.node.tsbuildinfo
+vite.config.js
+vite.config.d.ts
+.claude/

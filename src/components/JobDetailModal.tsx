@@ -9,6 +9,45 @@ interface JobDetailModalProps {
   onClose: () => void;
 }
 
+function CollapsibleSection({
+  title,
+  icon,
+  defaultOpen = false,
+  children,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  return (
+    <div className="border border-gray-200/60 dark:border-navy-700/30 rounded-xl overflow-hidden">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-navy-800/30 transition-colors"
+      >
+        <div className="flex items-center gap-2.5">
+          <span className="text-gray-400 dark:text-gray-500">{icon}</span>
+          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{title}</span>
+        </div>
+        <svg
+          className={`h-4 w-4 text-gray-400 dark:text-gray-500 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+        </svg>
+      </button>
+      {open && (
+        <div className="px-4 pb-4 pt-0 animate-fade-in">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const [showIntro, setShowIntro] = useState(false);
@@ -99,7 +138,7 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
           </div>
 
           {/* Body */}
-          <div className="p-6 space-y-5">
+          <div className="p-6 space-y-4">
             {/* Trust cue */}
             <div className="flex items-center gap-2">
               <span className="badge-community">
@@ -110,20 +149,32 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
               </span>
             </div>
 
-            {/* Summary */}
+            {/* Summary — always visible */}
             {job.summary && (
-              <div>
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Summary</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-line">
-                  {job.summary}
-                </p>
+              <div className="rounded-xl bg-accent-50/40 dark:bg-accent-900/10 border border-accent-200/40 dark:border-accent-800/20 p-4">
+                <div className="flex items-start gap-3">
+                  <svg className="h-5 w-5 text-accent-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+                  </svg>
+                  <div>
+                    <p className="text-xs font-semibold text-accent-700 dark:text-accent-400 uppercase tracking-wider mb-1.5">The real talk</p>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                      {job.summary}
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
 
-            {/* Standout Perks */}
+            {/* Standout Perks — always visible if present */}
             {job.standout_perks && job.standout_perks.length > 0 && (
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">What Stands Out</h3>
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-1.5">
+                  <svg className="h-4 w-4 text-sky-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  What Stands Out
+                </h3>
                 <div className="flex flex-wrap gap-2">
                   {job.standout_perks.map((perk) => (
                     <span
@@ -140,15 +191,38 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
               </div>
             )}
 
-            {/* Description */}
+            {/* Full Description — collapsible */}
             {job.description && (
-              <div>
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Full Description</h3>
-                <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-line max-h-96 overflow-y-auto pr-2">
+              <CollapsibleSection
+                title="Full Description"
+                icon={
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                  </svg>
+                }
+              >
+                <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-line">
                   {job.description}
                 </div>
-              </div>
+              </CollapsibleSection>
             )}
+
+            {/* Apply callout box */}
+            <div className="rounded-xl bg-gray-50 dark:bg-navy-900/40 border border-gray-200/60 dark:border-navy-700/30 p-4">
+              <div className="flex items-start gap-3">
+                <svg className="h-5 w-5 text-gray-400 dark:text-gray-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                </svg>
+                <div>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Two ways in</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                    <span className="font-semibold">Apply directly</span> — the link goes straight to {job.company}'s application.
+                    Or <span className="font-semibold">request a warm intro</span> and I'll personally put your name in front of the right person.
+                    Either way, you're taking a shot — and that counts.
+                  </p>
+                </div>
+              </div>
+            </div>
 
             {/* Meta */}
             <div className="text-xs text-gray-400 dark:text-gray-500">
@@ -170,7 +244,7 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 dark:border-navy-700/40">
+          <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 dark:border-navy-700/40 bg-gray-50/50 dark:bg-navy-900/20">
             <button onClick={onClose} className="btn-secondary">
               Close
             </button>
@@ -185,7 +259,7 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
             </button>
             {job.apply_url && (
               <button onClick={handleApply} className="btn-primary">
-                Apply Now
+                Apply Directly
                 <svg className="h-4 w-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
                 </svg>

@@ -71,6 +71,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       posted_date: new Date().toISOString(),
       expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       submission_ref: submissionRef,
+      submitter_name: payload.submitter_name || null,
       submitter_email: payload.submitter_email || null,
       tags: payload.tags || [],
       standout_perks: payload.standout_perks || [],

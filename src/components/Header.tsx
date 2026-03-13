@@ -9,15 +9,15 @@ export default function Header() {
     <header className="sticky top-0 z-50 border-b border-gray-200 dark:border-navy-700/40 bg-white/80 dark:bg-navy-950/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-accent-500 to-accent-600 font-bold text-white text-lg shadow-sm shadow-accent-500/20">
-            C
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-accent-500 to-accent-600 font-bold text-white text-sm shadow-sm shadow-accent-500/20">
+            FC
           </div>
           <div className="flex flex-col">
             <span className="text-lg font-semibold text-gray-900 dark:text-gray-100 group-hover:text-accent-600 dark:group-hover:text-accent-400 transition-colors leading-tight">
               {APP_NAME}
             </span>
             <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 tracking-wider uppercase leading-tight hidden sm:block">
-              Fintech & Banking
+              Jobs — Fintech & Banking
             </span>
           </div>
         </Link>

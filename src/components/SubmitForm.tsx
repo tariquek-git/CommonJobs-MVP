@@ -52,10 +52,10 @@ export default function SubmitForm() {
     apply_url: '',
     company_url: '',
     tags: [],
+    submitter_name: '',
     submitter_email: '',
     standout_perks: [],
   });
-  const [tagInput, setTagInput] = useState('');
   const [perkInput, setPerkInput] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [scraping, setScraping] = useState(false);
@@ -121,17 +121,6 @@ export default function SubmitForm() {
     }
   };
 
-  const handleAddTag = () => {
-    const tag = tagInput.trim();
-    if (tag && (!form.tags || form.tags.length < 10) && !form.tags?.includes(tag)) {
-      setForm((prev) => ({ ...prev, tags: [...(prev.tags || []), tag] }));
-      setTagInput('');
-    }
-  };
-
-  const handleRemoveTag = (tag: string) => {
-    setForm((prev) => ({ ...prev, tags: prev.tags?.filter((t) => t !== tag) }));
-  };
 
   const handleAddPerk = () => {
     const perk = perkInput.trim();
@@ -185,7 +174,7 @@ export default function SubmitForm() {
             setForm({
               title: '', company: '', location: '', country: '',
               description: '', summary: '', apply_url: '', company_url: '',
-              tags: [], submitter_email: '', standout_perks: [],
+              tags: [], submitter_name: '', submitter_email: '', standout_perks: [],
             });
           }}
           className="btn-secondary mt-6 block mx-auto"
@@ -286,30 +275,6 @@ export default function SubmitForm() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Tags</label>
-              <div className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddTag(); } }}
-                  className="input-field flex-1"
-                  placeholder="e.g., fintech, remote, senior"
-                />
-                <button type="button" onClick={handleAddTag} className="btn-secondary shrink-0">Add</button>
-              </div>
-              {form.tags && form.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {form.tags.map((tag) => (
-                    <span key={tag} className="inline-flex items-center gap-1 rounded-md bg-gray-100 dark:bg-navy-800 px-2.5 py-1 text-xs text-gray-600 dark:text-gray-400">
-                      {tag}
-                      <button type="button" onClick={() => handleRemoveTag(tag)} className="text-gray-400 hover:text-red-500 ml-0.5">&times;</button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
         )}
 
@@ -414,22 +379,21 @@ export default function SubmitForm() {
                     )}
                   </div>
                 )}
-                {form.tags && form.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mt-2">
-                    {form.tags.map((tag) => (
-                      <span key={tag} className="rounded-md bg-gray-100 dark:bg-navy-800 px-2 py-0.5 text-xs text-gray-600 dark:text-gray-400">{tag}</span>
-                    ))}
-                  </div>
-                )}
               </div>
             </div>
 
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Your Email (optional)</label>
-              <input type="email" value={form.submitter_email} onChange={(e) => updateField('submitter_email', e.target.value)} className="input-field" placeholder="you@email.com" />
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">We'll notify you when your post goes live. Never shared publicly.</p>
+            {/* Submitter contact */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Your Name</label>
+                <input type="text" value={form.submitter_name || ''} onChange={(e) => updateField('submitter_name', e.target.value)} className="input-field" placeholder="Jane Doe" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Your Email</label>
+                <input type="email" value={form.submitter_email} onChange={(e) => updateField('submitter_email', e.target.value)} className="input-field" placeholder="you@email.com" />
+              </div>
             </div>
+            <p className="text-xs text-gray-400 dark:text-gray-500 -mt-3">So we can notify you when it goes live and facilitate warm intros. Never shared publicly.</p>
 
             {/* Honeypot */}
             <div className="absolute -left-[9999px]" aria-hidden="true">

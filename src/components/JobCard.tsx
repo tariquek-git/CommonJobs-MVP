@@ -109,14 +109,6 @@ export default function JobCard({ job, onSelect }: JobCardProps) {
                 {job.location}
               </span>
             )}
-            {job.tags?.slice(0, 3).map((tag) => (
-              <span
-                key={tag}
-                className="inline-flex items-center rounded-md bg-gray-100 dark:bg-navy-800 px-2 py-0.5 text-xs text-gray-600 dark:text-gray-400"
-              >
-                {tag}
-              </span>
-            ))}
           </div>
 
           {job.standout_perks && job.standout_perks.length > 0 && (

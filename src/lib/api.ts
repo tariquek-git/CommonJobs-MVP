@@ -61,6 +61,23 @@ export async function trackClick(jobId: string): Promise<void> {
   }).catch(() => {});
 }
 
+// ── Warm Intro ──
+
+export interface WarmIntroPayload {
+  job_id: string;
+  name: string;
+  email: string;
+  linkedin?: string;
+  message?: string;
+}
+
+export async function requestWarmIntro(payload: WarmIntroPayload): Promise<{ success: boolean; message: string }> {
+  return request('/jobs/warm-intro', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
 // ── AI API ──
 
 export interface HumanizeResponse {

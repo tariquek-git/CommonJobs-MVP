@@ -1,4 +1,4 @@
-export const APP_NAME = 'Commons Jobs';
+export const APP_NAME = 'Fintech Commons';
 export const APP_DESCRIPTION = 'Fintech & Banking Job Board';
 
 export const FEEDS = {
@@ -12,7 +12,7 @@ export const FOUNDER_TEXT = `Hi, it's Tarique 👋
 
 Job boards were built to solve a real problem — connecting people with opportunity. But somewhere along the way, most became ad-saturated ghost towns full of fake listings and black-hole applications.
 
-Commons Jobs is different. The Community Board only features roles that are submitted directly by real people — reviewed, verified, with the possibility of a warm intro. No scraped spam. No phantom roles.
+Fintech Commons is different. The Community Board only features roles that are submitted directly by real people — reviewed, verified, with the possibility of a warm intro. No scraped spam. No phantom roles.
 
 That's what this is.`;
 

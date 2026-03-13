@@ -21,27 +21,27 @@ export async function sendApprovalEmail(to: string, job: Job): Promise<boolean> 
 
   try {
     await resend.emails.send({
-      from: 'Commons Jobs <notifications@commonsjobs.com>',
+      from: 'Fintech Commons <notifications@commonsjobs.com>',
       to,
       subject: `Your job posting "${job.title}" is now live!`,
       html: `
         <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
-          <h2 style="color: #0A1628; margin-bottom: 8px;">Your job is live on Commons Jobs</h2>
+          <h2 style="color: #0A1628; margin-bottom: 8px;">Your job is live on Fintech Commons</h2>
           <p style="color: #64748B; font-size: 15px; line-height: 1.6;">
             Great news — <strong>${job.title}</strong> at <strong>${job.company}</strong> has been reviewed and approved by our community moderators.
           </p>
           <p style="color: #64748B; font-size: 15px; line-height: 1.6;">
-            It's now visible to job seekers on the Commons Jobs board.
+            It's now visible to job seekers on the Fintech Commons board.
           </p>
           <a href="${jobUrl}" style="display: inline-block; background: #0D9488; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 16px;">
             View your posting
           </a>
           <p style="color: #94A3B8; font-size: 13px; margin-top: 24px;">
-            — The Commons Jobs team
+            — The Fintech Commons team
           </p>
         </div>
       `,
-      text: `Your job posting "${job.title}" at ${job.company} is now live on Commons Jobs!\n\nView it here: ${jobUrl}\n\n— The Commons Jobs team`,
+      text: `Your job posting "${job.title}" at ${job.company} is now live on Fintech Commons!\n\nView it here: ${jobUrl}\n\n— The Fintech Commons team`,
     });
     return true;
   } catch (err) {

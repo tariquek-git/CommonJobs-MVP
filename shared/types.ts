@@ -21,6 +21,7 @@ export interface Job {
   created_at: string;
   updated_at: string;
   submission_ref: string | null;
+  submitter_name: string | null;
   submitter_email: string | null;
   tags: string[];
   standout_perks: string[];
@@ -61,6 +62,7 @@ export interface SubmissionPayload {
   company_url?: string;
   tags?: string[];
   standout_perks?: string[];
+  submitter_name?: string;
   submitter_email?: string;
   // Honeypot - should be empty
   website?: string;

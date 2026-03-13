@@ -51,7 +51,7 @@ export default function JobPage() {
     getJob(id)
       .then((data) => {
         setJob(data);
-        document.title = `${data.title} at ${data.company} | Commons Jobs`;
+        document.title = `${data.title} at ${data.company} | Fintech Commons`;
       })
       .catch(() => setError('Job not found'))
       .finally(() => setLoading(false));
@@ -59,7 +59,7 @@ export default function JobPage() {
 
   useEffect(() => {
     return () => {
-      document.title = 'Commons Jobs';
+      document.title = 'Fintech Commons';
     };
   }, []);
 
@@ -184,20 +184,6 @@ export default function JobPage() {
               <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-line">
                 {job.description}
               </div>
-            </div>
-          )}
-
-          {/* Tags */}
-          {job.tags && job.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {job.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center rounded-md bg-gray-100 dark:bg-navy-800 px-2.5 py-1 text-xs text-gray-600 dark:text-gray-400"
-                >
-                  {tag}
-                </span>
-              ))}
             </div>
           )}
 

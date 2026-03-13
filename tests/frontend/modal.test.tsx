@@ -21,6 +21,7 @@ const mockJob: Job = {
   created_at: '2026-03-10T12:00:00Z',
   updated_at: '2026-03-10T12:00:00Z',
   submission_ref: 'CJ-TEST1234',
+  submitter_name: null,
   submitter_email: null,
   tags: ['fintech', 'remote'],
   standout_perks: [],
@@ -56,16 +57,10 @@ describe('JobDetailModal', () => {
     expect(onClose).toHaveBeenCalledOnce();
   });
 
-  it('shows community trust cues', () => {
+  it('shows community trust cues and warm intro button', () => {
     render(<JobDetailModal job={mockJob} onClose={() => {}} />);
     expect(screen.getByText('Community verified')).toBeInTheDocument();
-    expect(screen.getByText('Warm intro possible')).toBeInTheDocument();
-  });
-
-  it('renders tags', () => {
-    render(<JobDetailModal job={mockJob} onClose={() => {}} />);
-    expect(screen.getByText('fintech')).toBeInTheDocument();
-    expect(screen.getByText('remote')).toBeInTheDocument();
+    expect(screen.getByText('Warm Intro')).toBeInTheDocument();
   });
 
   it('shows standout perks when present', () => {

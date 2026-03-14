@@ -1,10 +1,14 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { humanizeJobPost } from '../../lib/ai.js';
+import { getClientIP, rateLimitOrReject, RATE_LIMITS } from '../../lib/rate-limit.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed', code: 'METHOD_NOT_ALLOWED' });
   }
+
+  const ip = getClientIP(req);
+  if (rateLimitOrReject(ip, RATE_LIMITS.aiScrape, res)) return;
 
   try {
     const { description, title } = req.body as { description: string; title: string };

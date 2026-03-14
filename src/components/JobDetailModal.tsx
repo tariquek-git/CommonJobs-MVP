@@ -24,17 +24,17 @@ function CollapsibleSection({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="border border-gray-200/60 dark:border-navy-700/30 rounded-xl overflow-hidden">
+    <div className="border border-gray-200/60 rounded-xl overflow-hidden">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-navy-800/30 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors"
       >
         <div className="flex items-center gap-2.5">
-          <span className="text-gray-400 dark:text-gray-500">{icon}</span>
-          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{title}</span>
+          <span className="text-gray-400">{icon}</span>
+          <span className="text-sm font-semibold text-gray-700">{title}</span>
         </div>
         <svg
-          className={`h-4 w-4 text-gray-400 dark:text-gray-500 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
+          className={`h-4 w-4 text-gray-400 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
           fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
@@ -87,7 +87,7 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
     <>
       <div
         ref={overlayRef}
-        className={`fixed inset-0 z-50 bg-black/40 dark:bg-black/60 backdrop-blur-sm animate-fade-in ${
+        className={`fixed inset-0 z-50 bg-black/40 backdrop-blur-sm animate-fade-in ${
           isMobile ? 'flex items-end' : 'flex items-start justify-center overflow-y-auto pt-12 pb-12 px-4'
         }`}
         onClick={(e) => {
@@ -102,21 +102,21 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
           {/* Mobile drag handle */}
           {isMobile && (
             <div className="flex justify-center pt-3 pb-1">
-              <div className="w-10 h-1 bg-gray-300 dark:bg-navy-600 rounded-full" />
+              <div className="w-10 h-1 bg-gray-300 rounded-full" />
             </div>
           )}
 
           {/* Header */}
-          <div className="flex items-start justify-between p-6 border-b border-gray-200/60 dark:border-navy-700/40">
+          <div className="flex items-start justify-between p-6 border-b border-gray-200/60">
             <div className="flex items-start gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-lg font-bold text-indigo-600 dark:text-indigo-400 shrink-0">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-lg font-bold text-indigo-600 shrink-0">
                 {(() => {
                   const logoUrl = job.company_logo_url || (job.company_url ? (() => { try { return `https://logo.clearbit.com/${new URL(job.company_url).hostname}`; } catch { return null; } })() : null);
                   return logoUrl ? (
                     <img
                       src={logoUrl}
                       alt={job.company}
-                      className="h-12 w-12 rounded-xl object-contain bg-gray-100 dark:bg-navy-800 p-1.5"
+                      className="h-12 w-12 rounded-xl object-contain bg-gray-100 p-1.5"
                       onError={(e) => {
                         const el = e.target as HTMLImageElement;
                         el.style.display = 'none';
@@ -128,9 +128,9 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
                 })()}
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 leading-snug">{job.title}</h2>
-                <p className="text-gray-500 dark:text-gray-400 mt-0.5">{job.company}</p>
-                <div className="flex items-center gap-3 mt-2 text-sm text-gray-400 dark:text-gray-500">
+                <h2 className="text-xl font-bold text-gray-900 leading-snug">{job.title}</h2>
+                <p className="text-gray-500 mt-0.5">{job.company}</p>
+                <div className="flex items-center gap-3 mt-2 text-sm text-gray-400">
                   {job.location && (
                     <span className="inline-flex items-center gap-1">
                       <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -146,7 +146,7 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
             </div>
             <button
               onClick={onClose}
-              className="rounded-full bg-gray-100 dark:bg-navy-800 p-2 hover:bg-gray-200 dark:hover:bg-navy-700 transition-colors -mt-1 -mr-1"
+              className="rounded-full bg-gray-100 p-2 hover:bg-gray-200 transition-colors -mt-1 -mr-1"
               aria-label="Close"
             >
               <svg className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -160,11 +160,11 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
             {/* Trust cue */}
             <div className="flex items-center gap-2">
               {job.tags?.includes('example') && (
-                <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 dark:bg-amber-900/15 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/30">
+                <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 border border-amber-200/60">
                   Example
                 </span>
               )}
-              <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 dark:bg-emerald-900/15 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+              <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
                 <svg className="h-3 w-3 mr-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
                 </svg>
@@ -174,14 +174,14 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
 
             {/* Summary */}
             {job.summary && (
-              <div className="rounded-xl bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-200/40 dark:border-indigo-800/20 p-4">
+              <div className="rounded-xl bg-indigo-50/50 border border-indigo-200/40 p-4">
                 <div className="flex items-start gap-3">
                   <svg className="h-5 w-5 text-indigo-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
                   </svg>
                   <div>
-                    <p className="text-xs font-semibold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider mb-1.5">The real talk</p>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                    <p className="text-xs font-semibold text-indigo-700 uppercase tracking-wider mb-1.5">The real talk</p>
+                    <p className="text-sm text-gray-700 leading-relaxed">
                       {job.summary}
                     </p>
                   </div>
@@ -192,7 +192,7 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
             {/* Standout Perks */}
             {job.standout_perks && job.standout_perks.length > 0 && (
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-1.5">
+                <h3 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
                   <svg className="h-4 w-4 text-indigo-500" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
@@ -202,7 +202,7 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
                   {job.standout_perks.map((perk) => (
                     <span
                       key={perk}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/15 px-3 py-1.5 text-sm font-medium text-indigo-700 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/30"
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-700 border border-indigo-200/60"
                     >
                       <svg className="h-3.5 w-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -224,21 +224,21 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
                   </svg>
                 }
               >
-                <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-line">
+                <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
                   {job.description}
                 </div>
               </CollapsibleSection>
             )}
 
             {/* Apply callout box */}
-            <div className="rounded-xl bg-gray-50 dark:bg-navy-900/40 border border-gray-200/60 dark:border-navy-700/30 p-4">
+            <div className="rounded-xl bg-gray-50 border border-gray-200/60 p-4">
               <div className="flex items-start gap-3">
-                <svg className="h-5 w-5 text-gray-400 dark:text-gray-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <svg className="h-5 w-5 text-gray-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
                 </svg>
                 <div>
-                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Two ways in</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                  <p className="text-sm font-semibold text-gray-700 mb-1">Two ways in</p>
+                  <p className="text-xs text-gray-500 leading-relaxed">
                     <span className="font-semibold">Apply directly</span> — the link goes straight to {job.company}'s application.
                     Or <span className="font-semibold">request a warm intro</span> and I'll personally put your name in front of the right person.
                     Either way, you're taking a shot — and that counts.
@@ -248,7 +248,7 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
             </div>
 
             {/* Meta */}
-            <div className="text-xs text-gray-400 dark:text-gray-500">
+            <div className="text-xs text-gray-400">
               Posted {formatDate(job.posted_date)}
               {job.company_url && (
                 <>
@@ -257,7 +257,7 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
                     href={job.company_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
+                    className="text-indigo-600 hover:text-indigo-700"
                   >
                     Company website
                   </a>
@@ -267,7 +267,7 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200/60 dark:border-navy-700/40 bg-gray-50/50 dark:bg-navy-900/20">
+          <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200/60 bg-gray-50/50">
             <button onClick={onClose} className="btn-secondary">
               Close
             </button>

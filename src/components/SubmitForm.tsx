@@ -18,7 +18,7 @@ function StepIndicator({ current, total }: { current: number; total: number }) {
               ? 'bg-indigo-600 text-white'
               : i === current
               ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/25'
-              : 'bg-gray-200 dark:bg-navy-800 text-gray-400 dark:text-gray-500'
+              : 'bg-gray-200 text-gray-400'
           }`}>
             {i < current ? (
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
@@ -29,7 +29,7 @@ function StepIndicator({ current, total }: { current: number; total: number }) {
             )}
           </div>
           {i < total - 1 && (
-            <div className="flex-1 h-1 rounded-full overflow-hidden bg-gray-200 dark:bg-navy-800">
+            <div className="flex-1 h-1 rounded-full overflow-hidden bg-gray-200">
               <div className={`h-full rounded-full transition-all duration-500 ${
                 i < current ? 'w-full bg-indigo-600' : 'w-0'
               }`} />
@@ -159,17 +159,17 @@ export default function SubmitForm() {
   if (result) {
     return (
       <div className="surface-elevated p-8 text-center max-w-lg mx-auto animate-scale-in">
-        <div className="inline-flex h-16 w-16 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-900/20 mb-4">
+        <div className="inline-flex h-16 w-16 items-center justify-center rounded-xl bg-indigo-50 mb-4">
           <svg className="h-8 w-8 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">You're in the queue</h2>
-        <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">{result.message}</p>
-        <p className="text-gray-400 dark:text-gray-500 text-xs mb-4">I'll personally review this and get it live as soon as I can. No bots here.</p>
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">You're in the queue</h2>
+        <p className="text-gray-500 text-sm mb-1">{result.message}</p>
+        <p className="text-gray-400 text-xs mb-4">I'll personally review this and get it live as soon as I can. No bots here.</p>
         <div className="surface-tinted p-4 inline-block rounded-xl">
-          <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">Reference ID</p>
-          <p className="text-lg font-mono font-bold text-indigo-600 dark:text-indigo-400">{result.ref}</p>
+          <p className="text-xs text-gray-400 mb-1">Reference ID</p>
+          <p className="text-lg font-mono font-bold text-indigo-600">{result.ref}</p>
         </div>
         <button
           onClick={() => {
@@ -195,8 +195,8 @@ export default function SubmitForm() {
       <StepIndicator current={step} total={STEPS.length} />
 
       {aiFallback && (
-        <div className="rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/30 p-3 mb-6" role="alert">
-          <p className="text-xs text-amber-700 dark:text-amber-400">
+        <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 mb-6" role="alert">
+          <p className="text-xs text-amber-700">
             AI features are temporarily unavailable. You can still edit and submit manually.
           </p>
         </div>
@@ -206,10 +206,10 @@ export default function SubmitForm() {
         {/* Step 0: Job Details + Description */}
         {step === 0 && (
           <div className="space-y-5">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">Job Details</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">Job Details</h3>
 
             {/* Scout's honour callout */}
-            <div className="rounded-xl bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-200/40 dark:border-indigo-800/20 p-4">
+            <div className="rounded-xl bg-indigo-50/50 border border-indigo-200/40 p-4">
               <div className="flex gap-3">
                 <div className="shrink-0 mt-0.5">
                   <svg className="h-5 w-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
@@ -217,8 +217,8 @@ export default function SubmitForm() {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-indigo-700 dark:text-indigo-400 mb-0.5">Scout's honour</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                  <p className="text-sm font-medium text-indigo-700 mb-0.5">Scout's honour</p>
+                  <p className="text-xs text-gray-600 leading-relaxed">
                     Every role posted here is personally reviewed before it goes live.
                     No spam, no ghost listings, no roles that expired three months ago.
                     If it's on the board, it's real.
@@ -229,7 +229,7 @@ export default function SubmitForm() {
 
             {/* URL Auto-fill */}
             <div>
-              <label htmlFor="submit-apply-url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Job URL (optional)</label>
+              <label htmlFor="submit-apply-url" className="block text-sm font-medium text-gray-700 mb-1.5">Job URL (optional)</label>
               <div className="flex gap-2">
                 <input
                   id="submit-apply-url"
@@ -255,20 +255,20 @@ export default function SubmitForm() {
                 </button>
               </div>
               {scrapeFailed && (
-                <p className="text-xs text-amber-600 dark:text-amber-400 mt-1" role="alert">Could not scrape — fill in manually below.</p>
+                <p className="text-xs text-amber-600 mt-1" role="alert">Could not scrape — fill in manually below.</p>
               )}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="submit-title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label htmlFor="submit-title" className="block text-sm font-medium text-gray-700 mb-1.5">
                   Job Title <span className="text-red-500" aria-hidden="true">*</span>
                   <span className="sr-only">(required)</span>
                 </label>
                 <input id="submit-title" type="text" value={form.title} onChange={(e) => updateField('title', e.target.value)} className="input-field" placeholder="Senior Software Engineer" required aria-required="true" />
               </div>
               <div>
-                <label htmlFor="submit-company" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label htmlFor="submit-company" className="block text-sm font-medium text-gray-700 mb-1.5">
                   Company <span className="text-red-500" aria-hidden="true">*</span>
                   <span className="sr-only">(required)</span>
                 </label>
@@ -278,22 +278,22 @@ export default function SubmitForm() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="submit-location" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Location</label>
+                <label htmlFor="submit-location" className="block text-sm font-medium text-gray-700 mb-1.5">Location</label>
                 <input id="submit-location" type="text" value={form.location} onChange={(e) => updateField('location', e.target.value)} className="input-field" placeholder="Toronto, ON" />
               </div>
               <div>
-                <label htmlFor="submit-country" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Country</label>
+                <label htmlFor="submit-country" className="block text-sm font-medium text-gray-700 mb-1.5">Country</label>
                 <input id="submit-country" type="text" value={form.country} onChange={(e) => updateField('country', e.target.value)} className="input-field" placeholder="Canada" />
               </div>
             </div>
 
             <div>
-              <label htmlFor="submit-company-url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Company Website</label>
+              <label htmlFor="submit-company-url" className="block text-sm font-medium text-gray-700 mb-1.5">Company Website</label>
               <input id="submit-company-url" type="url" value={form.company_url} onChange={(e) => updateField('company_url', e.target.value)} className="input-field" placeholder="https://company.com" />
             </div>
 
             <div>
-              <label htmlFor="submit-description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Job Description</label>
+              <label htmlFor="submit-description" className="block text-sm font-medium text-gray-700 mb-1.5">Job Description</label>
               <textarea
                 id="submit-description"
                 value={form.description}
@@ -311,7 +311,7 @@ export default function SubmitForm() {
         {step === 1 && (
           <div className="space-y-5">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Humanize & Review</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Humanize & Review</h3>
               <button
                 type="button"
                 onClick={handleHumanize}
@@ -338,13 +338,13 @@ export default function SubmitForm() {
               </button>
             </div>
 
-            <p className="text-xs text-gray-500 dark:text-gray-400 -mt-3">
+            <p className="text-xs text-gray-500 -mt-3">
               AI rewrites the corporate description into plain language tailored to the role and highlights standout perks.
             </p>
 
             {/* Humanized summary */}
             <div>
-              <label htmlFor="submit-summary" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Humanized Description</label>
+              <label htmlFor="submit-summary" className="block text-sm font-medium text-gray-700 mb-1.5">Humanized Description</label>
               <textarea
                 id="submit-summary"
                 value={form.summary}
@@ -357,14 +357,14 @@ export default function SubmitForm() {
 
             {/* Standout perks */}
             <div>
-              <label htmlFor="submit-perk-input" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+              <label htmlFor="submit-perk-input" className="block text-sm font-medium text-gray-700 mb-1.5">
                 Standout Perks
-                <span className="text-xs text-gray-400 dark:text-gray-500 ml-2 font-normal">Beyond the usual 401k, dental, vision</span>
+                <span className="text-xs text-gray-400 ml-2 font-normal">Beyond the usual 401k, dental, vision</span>
               </label>
               {form.standout_perks && form.standout_perks.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-2">
                   {form.standout_perks.map((perk) => (
-                    <span key={perk} className="inline-flex items-center gap-1 rounded-full bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-800/30 px-2.5 py-1 text-xs text-indigo-700 dark:text-indigo-400">
+                    <span key={perk} className="inline-flex items-center gap-1 rounded-full bg-indigo-50 border border-indigo-200 px-2.5 py-1 text-xs text-indigo-700">
                       <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
                       </svg>
@@ -390,16 +390,16 @@ export default function SubmitForm() {
 
             {/* Preview card */}
             <div>
-              <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Preview</p>
+              <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Preview</p>
               <div className="surface-elevated p-5 relative overflow-hidden">
-                <h4 className="font-semibold text-gray-900 dark:text-gray-100">{form.title || 'Untitled'}</h4>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{form.company || 'No company'}</p>
-                {form.location && <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{form.location}{form.country ? `, ${form.country}` : ''}</p>}
-                {form.summary && <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mt-2 line-clamp-3">{form.summary}</p>}
+                <h4 className="font-semibold text-gray-900">{form.title || 'Untitled'}</h4>
+                <p className="text-sm text-gray-500 mt-0.5">{form.company || 'No company'}</p>
+                {form.location && <p className="text-xs text-gray-400 mt-1">{form.location}{form.country ? `, ${form.country}` : ''}</p>}
+                {form.summary && <p className="text-sm text-gray-600 leading-relaxed mt-2 line-clamp-3">{form.summary}</p>}
                 {form.standout_perks && form.standout_perks.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {form.standout_perks.slice(0, 3).map((perk) => (
-                      <span key={perk} className="inline-flex items-center gap-1 rounded-full bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-800/30 px-2 py-0.5 text-xs text-indigo-700 dark:text-indigo-400">
+                      <span key={perk} className="inline-flex items-center gap-1 rounded-full bg-indigo-50 border border-indigo-200 px-2 py-0.5 text-xs text-indigo-700">
                         <svg className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
                         </svg>
@@ -415,7 +415,7 @@ export default function SubmitForm() {
             </div>
 
             {/* Warm intro opt-in */}
-            <div className="rounded-xl bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-200/40 dark:border-indigo-800/20 p-4">
+            <div className="rounded-xl bg-indigo-50/50 border border-indigo-200/40 p-4">
               <div className="flex items-start gap-3">
                 <button
                   type="button"
@@ -424,7 +424,7 @@ export default function SubmitForm() {
                   aria-label="Allow warm intros for this role"
                   onClick={() => setForm((prev) => ({ ...prev, warm_intro_ok: !prev.warm_intro_ok }))}
                   className={`shrink-0 mt-0.5 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:ring-offset-2 ${
-                    form.warm_intro_ok ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-navy-600'
+                    form.warm_intro_ok ? 'bg-indigo-600' : 'bg-gray-300'
                   }`}
                 >
                   <span className={`inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${
@@ -432,17 +432,17 @@ export default function SubmitForm() {
                   }`} />
                 </button>
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Allow warm intros for this role</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed mt-0.5">
+                  <p className="text-sm font-medium text-gray-900">Allow warm intros for this role</p>
+                  <p className="text-xs text-gray-600 leading-relaxed mt-0.5">
                     Candidates can request a warm intro through me. When they do, I'll send you an email with their info so you can connect directly.
                   </p>
                   {form.warm_intro_ok && (
-                    <div className="mt-3 rounded-xl bg-white/60 dark:bg-navy-900/40 border border-indigo-200/40 dark:border-indigo-800/20 p-3">
+                    <div className="mt-3 rounded-xl bg-white/60 border border-indigo-200/40 p-3">
                       <div className="flex gap-2">
                         <svg className="h-4 w-4 text-indigo-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <p className="text-xs text-indigo-700 dark:text-indigo-400 leading-relaxed">
+                        <p className="text-xs text-indigo-700 leading-relaxed">
                           <span className="font-semibold">Scout's honour:</span> By opting in, you're committing to take a look when someone's info lands in your inbox. You don't have to hire them — just engage in good faith. That's what makes this work.
                         </p>
                       </div>
@@ -453,23 +453,23 @@ export default function SubmitForm() {
             </div>
 
             {/* Submitter contact */}
-            <div className="rounded-xl bg-gray-50 dark:bg-navy-900/40 border border-gray-200/60 dark:border-navy-700/30 p-4 space-y-3">
+            <div className="rounded-xl bg-gray-50 border border-gray-200/60 p-4 space-y-3">
               <div className="flex items-center gap-2 mb-1">
-                <svg className="h-4 w-4 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
+                <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                 </svg>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">A bit about you</p>
+                <p className="text-sm font-medium text-gray-700">A bit about you</p>
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed -mt-1">
+              <p className="text-xs text-gray-500 leading-relaxed -mt-1">
                 So I can let you know when it's live and connect candidates who want a warm intro. Never shared publicly.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label htmlFor="submit-your-name" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Your Name</label>
+                  <label htmlFor="submit-your-name" className="block text-xs font-medium text-gray-600 mb-1">Your Name</label>
                   <input id="submit-your-name" type="text" value={form.submitter_name || ''} onChange={(e) => updateField('submitter_name', e.target.value)} className="input-field" placeholder="Jane Doe" />
                 </div>
                 <div>
-                  <label htmlFor="submit-your-email" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Your Email</label>
+                  <label htmlFor="submit-your-email" className="block text-xs font-medium text-gray-600 mb-1">Your Email</label>
                   <input id="submit-your-email" type="email" value={form.submitter_email} onChange={(e) => updateField('submitter_email', e.target.value)} className="input-field" placeholder="you@email.com" />
                 </div>
               </div>

@@ -16,10 +16,10 @@ export default function HomePage() {
   const [showTerms, setShowTerms] = useState(false);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-navy-950">
+    <div className="min-h-screen bg-white">
       <Header />
 
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6 pb-24 lg:pb-8 space-y-5">
+      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6 pb-28 lg:pb-8 space-y-5">
         <FounderSection />
 
         <SortStrip sort={sort} onSortChange={setSort} meta={meta} onRefresh={refresh} tags={tags} onTagsChange={setTags} />
@@ -33,11 +33,11 @@ export default function HomePage() {
         </div>
 
         {/* Footer */}
-        <footer className="border-t border-gray-100 dark:border-navy-800/40 pt-4 pb-2 flex flex-wrap items-center justify-between gap-2 text-xs text-gray-400 dark:text-gray-500">
+        <footer className="border-t border-gray-100 pt-4 pb-2 flex flex-wrap items-center justify-between gap-2 text-xs text-gray-400">
           <p>Fintech Commons — a hobby project by Tarique Khan. Apache 2.0.</p>
           <button
             onClick={() => setShowTerms(true)}
-            className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors underline underline-offset-2"
+            className="hover:text-indigo-600 transition-colors underline underline-offset-2"
           >
             Terms & Conditions
           </button>

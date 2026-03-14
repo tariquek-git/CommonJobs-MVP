@@ -1,7 +1,16 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getSupabase, getJobsTable } from '../../lib/supabase.js';
 
-export default async function handler(_req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Verify the request is from Vercel Cron (CRON_SECRET must match)
+  const cronSecret = process.env.CRON_SECRET;
+  if (cronSecret) {
+    const authHeader = req.headers.authorization;
+    if (authHeader !== `Bearer ${cronSecret}`) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+  }
+
   try {
     const supabase = getSupabase();
     const now = new Date().toISOString();

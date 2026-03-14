@@ -1,5 +1,6 @@
-// Simple in-memory rate limiter for serverless functions
-// Uses a sliding window approach per IP
+// In-memory rate limiter with per-endpoint configuration.
+// On serverless each instance has its own store — provides burst protection
+// per instance. Acceptable for MVP traffic; upgrade to Redis/Upstash at scale.
 
 interface RateLimitEntry {
   count: number;
@@ -8,21 +9,7 @@ interface RateLimitEntry {
 
 const store = new Map<string, RateLimitEntry>();
 
-const WINDOW_MS = 60 * 1000; // 1 minute
-const MAX_REQUESTS = 10; // per window
-
-// Clean up stale entries periodically
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, entry] of store.entries()) {
-    if (now > entry.resetAt) {
-      store.delete(key);
-    }
-  }
-}, 60 * 1000);
-
 export function getClientIP(request: Request | { headers: Record<string, string | string[] | undefined> }): string {
-  // Support both Web API Request (headers.get) and Node/Vercel IncomingMessage (headers object)
   const getHeader = (name: string): string | undefined => {
     if ('get' in request.headers && typeof request.headers.get === 'function') {
       return request.headers.get(name) ?? undefined;
@@ -43,7 +30,11 @@ export function getClientIP(request: Request | { headers: Record<string, string 
   return 'unknown';
 }
 
-export function checkRateLimit(ip: string, limit = MAX_REQUESTS, windowMs = WINDOW_MS): { allowed: boolean; remaining: number; resetAt: number } {
+export function checkRateLimit(
+  ip: string,
+  limit: number,
+  windowMs: number,
+): { allowed: boolean; remaining: number; resetAt: number } {
   const now = Date.now();
   const key = `rl:${ip}`;
 
@@ -60,4 +51,33 @@ export function checkRateLimit(ip: string, limit = MAX_REQUESTS, windowMs = WIND
     remaining: Math.max(0, limit - entry.count),
     resetAt: entry.resetAt,
   };
+}
+
+// Pre-configured rate limits for each endpoint type
+export const RATE_LIMITS = {
+  adminLogin: { limit: 5, windowMs: 5 * 60 * 1000 },
+  submission: { limit: 5, windowMs: 60 * 60 * 1000 },
+  warmIntro: { limit: 10, windowMs: 60 * 60 * 1000 },
+  aiScrape: { limit: 10, windowMs: 10 * 60 * 1000 },
+  search: { limit: 60, windowMs: 60 * 1000 },
+} as const;
+
+/** Check rate limit and send 429 if exceeded. Returns true if request was blocked. */
+export function rateLimitOrReject(
+  ip: string,
+  config: { limit: number; windowMs: number },
+  res: { status: (code: number) => { json: (body: unknown) => unknown }; setHeader: (k: string, v: string) => void },
+): boolean {
+  const result = checkRateLimit(ip, config.limit, config.windowMs);
+  res.setHeader('X-RateLimit-Limit', String(config.limit));
+  res.setHeader('X-RateLimit-Remaining', String(result.remaining));
+  res.setHeader('X-RateLimit-Reset', String(Math.ceil(result.resetAt / 1000)));
+
+  if (!result.allowed) {
+    const retryAfter = Math.ceil((result.resetAt - Date.now()) / 1000);
+    res.setHeader('Retry-After', String(retryAfter));
+    res.status(429).json({ error: 'Too many requests. Please try again later.', code: 'RATE_LIMITED' });
+    return true;
+  }
+  return false;
 }

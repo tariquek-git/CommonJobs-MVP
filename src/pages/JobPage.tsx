@@ -81,20 +81,20 @@ export default function JobPage() {
   if (error || !job) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <p className="text-gray-500 dark:text-gray-400">{error || 'Job not found'}</p>
+        <p className="text-gray-500">{error || 'Job not found'}</p>
         <Link to="/" className="btn-primary">Back to jobs</Link>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-navy-950">
+    <div className="min-h-screen bg-gray-50">
       <JsonLd job={job} />
 
       {/* Nav */}
-      <header className="border-b border-gray-200 dark:border-navy-800/50 bg-white/80 dark:bg-navy-950/80 backdrop-blur-sm">
+      <header className="border-b border-gray-200 bg-white/80 backdrop-blur-sm">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-3">
-          <Link to="/" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 text-sm font-medium">
+          <Link to="/" className="text-indigo-600 hover:text-indigo-700 text-sm font-medium">
             &larr; All Jobs
           </Link>
         </div>
@@ -104,14 +104,14 @@ export default function JobPage() {
         <article className="surface-elevated p-6 sm:p-8 space-y-6">
           {/* Header */}
           <div className="flex items-start gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-lg font-bold text-indigo-600 dark:text-indigo-400 shrink-0">
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-indigo-50 text-lg font-bold text-indigo-600 shrink-0">
               {(() => {
                 const logoUrl = job.company_logo_url || (job.company_url ? (() => { try { return `https://logo.clearbit.com/${new URL(job.company_url).hostname}`; } catch { return null; } })() : null);
                 return logoUrl ? (
                   <img
                     src={logoUrl}
                     alt={job.company}
-                    className="h-14 w-14 rounded-xl object-contain bg-gray-100 dark:bg-navy-800 p-2"
+                    className="h-14 w-14 rounded-xl object-contain bg-gray-100 p-2"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = 'none';
                     }}
@@ -122,9 +122,9 @@ export default function JobPage() {
               })()}
             </div>
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{job.title}</h1>
-              <p className="text-gray-500 dark:text-gray-400 mt-1">{job.company}</p>
-              <div className="flex items-center gap-3 mt-2 text-sm text-gray-400 dark:text-gray-500">
+              <h1 className="text-2xl font-semibold text-gray-900">{job.title}</h1>
+              <p className="text-gray-500 mt-1">{job.company}</p>
+              <div className="flex items-center gap-3 mt-2 text-sm text-gray-400">
                 {job.location && (
                   <span className="inline-flex items-center gap-1">
                     <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -141,14 +141,14 @@ export default function JobPage() {
 
           {/* Badges */}
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 dark:bg-emerald-900/15 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+            <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
               <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
               </svg>
               Reviewed
             </span>
             {job.warm_intro_ok && (
-              <span className="inline-flex items-center gap-1 rounded-md bg-indigo-50 dark:bg-indigo-900/15 px-2 py-0.5 text-xs font-medium text-indigo-700 dark:text-indigo-400">
+              <span className="inline-flex items-center gap-1 rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700">
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                 </svg>
@@ -160,12 +160,12 @@ export default function JobPage() {
           {/* Standout Perks */}
           {job.standout_perks && job.standout_perks.length > 0 && (
             <div>
-              <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">What Stands Out</h2>
+              <h2 className="text-sm font-semibold text-gray-700 mb-2">What Stands Out</h2>
               <div className="flex flex-wrap gap-2">
                 {job.standout_perks.map((perk) => (
                   <span
                     key={perk}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-sky-50 dark:bg-sky-900/15 px-3 py-1.5 text-sm font-medium text-sky-700 dark:text-sky-400 border border-sky-200 dark:border-sky-800/30"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-sky-50 px-3 py-1.5 text-sm font-medium text-sky-700 border border-sky-200"
                   >
                     <svg className="h-3.5 w-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -180,8 +180,8 @@ export default function JobPage() {
           {/* Summary */}
           {job.summary && (
             <div>
-              <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Summary</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-line">
+              <h2 className="text-sm font-semibold text-gray-700 mb-2">Summary</h2>
+              <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
                 {job.summary}
               </p>
             </div>
@@ -190,22 +190,22 @@ export default function JobPage() {
           {/* Description */}
           {job.description && (
             <div>
-              <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Full Description</h2>
-              <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-line">
+              <h2 className="text-sm font-semibold text-gray-700 mb-2">Full Description</h2>
+              <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
                 {job.description}
               </div>
             </div>
           )}
 
           {/* Meta + CTA */}
-          <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-navy-700/40">
-            <div className="text-xs text-gray-400 dark:text-gray-500">
+          <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+            <div className="text-xs text-gray-400">
               {job.company_url && (
                 <a
                   href={job.company_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
+                  className="text-indigo-600 hover:text-indigo-700"
                 >
                   Company website
                 </a>

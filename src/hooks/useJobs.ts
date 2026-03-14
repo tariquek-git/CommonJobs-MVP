@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { searchJobs } from '../lib/api';
 import type { Job, SortOption, SearchMeta } from '../lib/types';
 
@@ -15,12 +16,31 @@ interface UseJobsReturn {
 }
 
 export function useJobs(): UseJobsReturn {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [meta, setMeta] = useState<SearchMeta | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sort, setSort] = useState<SortOption>('newest');
-  const [tags, setTags] = useState<string[]>([]);
+
+  const sortParam = searchParams.get('sort');
+  const sort: SortOption = sortParam === 'oldest' ? 'oldest' : 'newest';
+  const tags = searchParams.getAll('tag');
+
+  const setSort = (s: SortOption) => {
+    setSearchParams((prev) => {
+      if (s === 'newest') prev.delete('sort');
+      else prev.set('sort', s);
+      return prev;
+    });
+  };
+
+  const setTags = (t: string[]) => {
+    setSearchParams((prev) => {
+      prev.delete('tag');
+      t.forEach((tag) => prev.append('tag', tag));
+      return prev;
+    });
+  };
 
   const fetchJobs = useCallback(async () => {
     setLoading(true);
@@ -35,7 +55,7 @@ export function useJobs(): UseJobsReturn {
     } finally {
       setLoading(false);
     }
-  }, [sort, tags]);
+  }, [sort, tags.join(',')]);
 
   useEffect(() => {
     fetchJobs();

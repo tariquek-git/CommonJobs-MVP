@@ -70,9 +70,9 @@ function ToastContainer({ toasts, onDismiss }: { toasts: Toast[]; onDismiss: (id
         <div
           key={t.id}
           className={`pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl
-            bg-white/90 dark:bg-navy-800/90 backdrop-blur-lg border border-gray-200/60 dark:border-navy-700/50
-            shadow-lg shadow-gray-900/[0.08] dark:shadow-navy-950/50
-            text-sm text-gray-800 dark:text-gray-200
+            bg-white/90 backdrop-blur-lg border border-gray-200/60
+            shadow-lg shadow-gray-900/[0.08]
+            text-sm text-gray-800
             ${t.exiting ? 'animate-toast-out' : 'animate-toast-in'}`}
           role="alert"
         >
@@ -80,7 +80,7 @@ function ToastContainer({ toasts, onDismiss }: { toasts: Toast[]; onDismiss: (id
           <span>{t.message}</span>
           <button
             onClick={() => onDismiss(t.id)}
-            className="ml-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+            className="ml-1 text-gray-400 hover:text-gray-600 transition-colors"
             aria-label="Dismiss notification"
           >
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">

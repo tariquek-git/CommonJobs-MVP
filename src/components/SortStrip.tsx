@@ -20,13 +20,13 @@ export default function SortStrip({ sort, onSortChange, meta, onRefresh, tags, o
     <div className="space-y-3 lg:hidden">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
+          <span className="text-sm font-bold text-indigo-600">
             {meta?.total ?? 0} {meta?.total === 1 ? 'role' : 'roles'}
           </span>
           <select
             value={sort}
             onChange={(e) => onSortChange(e.target.value as SortOption)}
-            className="bg-white dark:bg-navy-900 border border-gray-200 dark:border-navy-700/50 rounded-lg text-sm text-gray-700 dark:text-gray-300 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            className="bg-white border border-gray-200 rounded-lg text-sm text-gray-700 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
           >
             <option value="newest">Newest first</option>
             <option value="oldest">Oldest first</option>
@@ -50,7 +50,7 @@ export default function SortStrip({ sort, onSortChange, meta, onRefresh, tags, o
             className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               tags.includes(cat)
                 ? 'bg-indigo-600 text-white'
-                : 'bg-gray-100 dark:bg-navy-800 text-gray-600 dark:text-gray-400'
+                : 'bg-gray-100 text-gray-600'
             }`}
           >
             {cat}
@@ -59,7 +59,7 @@ export default function SortStrip({ sort, onSortChange, meta, onRefresh, tags, o
         {tags.length > 0 && (
           <button
             onClick={() => onTagsChange([])}
-            className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-400 dark:text-gray-500 hover:text-gray-600"
+            className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-400 hover:text-gray-600"
           >
             Clear
           </button>

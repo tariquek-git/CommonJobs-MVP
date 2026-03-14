@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getSupabase, getJobsTable } from '../../lib/supabase.js';
 import { validateSubmission, sanitizeSubmission } from '../../shared/validation.js';
 import type { SubmissionPayload, SubmissionResponse } from '../../shared/types.js';
+import { getClientIP, rateLimitOrReject, RATE_LIMITS } from '../../lib/rate-limit.js';
 
 function generateRefId(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -17,6 +18,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed', code: 'METHOD_NOT_ALLOWED' });
   }
+
+  const ip = getClientIP(req);
+  if (rateLimitOrReject(ip, RATE_LIMITS.submission, res)) return;
 
   try {
     // Validate

@@ -1,10 +1,23 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getSupabase } from '../../lib/supabase.js';
+import { getClientIP, rateLimitOrReject, RATE_LIMITS } from '../../lib/rate-limit.js';
+
+function escHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed', code: 'METHOD_NOT_ALLOWED' });
   }
+
+  const ip = getClientIP(req);
+  if (rateLimitOrReject(ip, RATE_LIMITS.warmIntro, res)) return;
 
   try {
     const { job_id, name, email, linkedin, message } = req.body || {};
@@ -41,9 +54,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
       const { Resend } = await import('resend');
       const key = process.env.RESEND_API_KEY;
+      const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || 'tarique@fintechcommons.com';
       if (key) {
         const resend = new Resend(key);
-        // Look up the job title for the email
         const { data: job } = await supabase
           .from('jobs')
           .select('title, company')
@@ -51,19 +64,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           .single();
 
         const jobLabel = job ? `${job.title} at ${job.company}` : `Job ${job_id}`;
+        const safeName = escHtml(name.trim());
+        const safeEmail = escHtml(email.trim());
+        const safeJobLabel = escHtml(jobLabel);
+        const safeLinkedin = linkedin?.trim() ? escHtml(linkedin.trim()) : '';
+        const safeMessage = message?.trim() ? escHtml(message.trim()) : '';
 
         await resend.emails.send({
           from: 'Fintech Commons <notifications@commonsjobs.com>',
-          to: 'tarique@fintechcommons.com',
+          to: adminEmail,
           subject: `Warm Intro Request: ${jobLabel}`,
           html: `
             <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
               <h2 style="color: #0A1628; margin-bottom: 8px;">New Warm Intro Request</h2>
-              <p style="color: #64748B; font-size: 15px;"><strong>Role:</strong> ${jobLabel}</p>
-              <p style="color: #64748B; font-size: 15px;"><strong>Name:</strong> ${name.trim()}</p>
-              <p style="color: #64748B; font-size: 15px;"><strong>Email:</strong> ${email.trim()}</p>
-              ${linkedin?.trim() ? `<p style="color: #64748B; font-size: 15px;"><strong>LinkedIn:</strong> <a href="${linkedin.trim()}">${linkedin.trim()}</a></p>` : ''}
-              ${message?.trim() ? `<p style="color: #64748B; font-size: 15px;"><strong>Message:</strong> ${message.trim()}</p>` : ''}
+              <p style="color: #64748B; font-size: 15px;"><strong>Role:</strong> ${safeJobLabel}</p>
+              <p style="color: #64748B; font-size: 15px;"><strong>Name:</strong> ${safeName}</p>
+              <p style="color: #64748B; font-size: 15px;"><strong>Email:</strong> ${safeEmail}</p>
+              ${safeLinkedin ? `<p style="color: #64748B; font-size: 15px;"><strong>LinkedIn:</strong> <a href="${safeLinkedin}">${safeLinkedin}</a></p>` : ''}
+              ${safeMessage ? `<p style="color: #64748B; font-size: 15px;"><strong>Message:</strong> ${safeMessage}</p>` : ''}
               <hr style="border: none; border-top: 1px solid #E2E8F0; margin: 16px 0;" />
               <p style="color: #94A3B8; font-size: 13px;">— Fintech Commons</p>
             </div>
@@ -73,7 +91,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     } catch (emailErr) {
       console.error('Warm intro email error:', emailErr);
-      // Non-blocking — intro is still saved
     }
 
     return res.status(201).json({

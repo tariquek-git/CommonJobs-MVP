@@ -24,10 +24,10 @@ export default function Header() {
               FC
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-tight">
+              <span className="text-2xl font-bold tracking-tight text-gray-900 group-hover:text-indigo-600 transition-colors leading-tight">
                 {APP_NAME}
               </span>
-              <span className="text-sm text-gray-500 dark:text-gray-500 leading-tight hidden sm:block">
+              <span className="text-sm text-gray-500 leading-tight hidden sm:block">
                 Jobs — Fintech & Banking
               </span>
             </div>
@@ -36,7 +36,7 @@ export default function Header() {
           <nav className="flex items-center gap-1">
             <Link
               to="/"
-              className={`btn-ghost px-4 ${location.pathname === '/' ? 'text-gray-900 dark:text-gray-100 bg-gray-100/80 dark:bg-navy-800' : ''}`}
+              className={`btn-ghost px-4 ${location.pathname === '/' ? 'text-gray-900 bg-gray-100/80' : ''}`}
             >
               Jobs
             </Link>
@@ -45,7 +45,7 @@ export default function Header() {
               className="btn-ghost px-4 flex items-center gap-1.5"
               title="About Tarique"
             >
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 text-[10px] font-bold text-indigo-600">
                 TK
               </div>
               <span className="hidden sm:inline text-sm">About</span>

@@ -1,11 +1,15 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getSupabase, getJobsTable } from '../../lib/supabase.js';
 import type { SearchRequest, SearchResponse, Job } from '../../shared/types.js';
+import { getClientIP, rateLimitOrReject, RATE_LIMITS } from '../../lib/rate-limit.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed', code: 'METHOD_NOT_ALLOWED' });
   }
+
+  const ip = getClientIP(req);
+  if (rateLimitOrReject(ip, RATE_LIMITS.search, res)) return;
 
   try {
     const body = req.body as SearchRequest;

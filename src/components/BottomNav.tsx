@@ -45,10 +45,10 @@ export default function BottomNav() {
               <button
                 key={item.label}
                 onClick={() => setShowAbout(true)}
-                className="flex flex-col items-center gap-0.5 text-gray-400 active:scale-95 transition-transform min-w-[64px]"
+                className="flex flex-col items-center gap-0.5 text-gray-600 active:scale-95 transition-transform min-w-[64px]"
               >
                 {item.icon}
-                <span className="text-[10px] font-medium">{item.label}</span>
+                <span className="text-xs font-medium">{item.label}</span>
               </button>
             ) : (
               <Link
@@ -57,11 +57,11 @@ export default function BottomNav() {
                 className={`flex flex-col items-center gap-0.5 active:scale-95 transition-transform min-w-[64px] ${
                   location.pathname === item.path
                     ? 'text-indigo-600'
-                    : 'text-gray-400'
+                    : 'text-gray-600'
                 }`}
               >
                 {item.icon}
-                <span className="text-[10px] font-medium">{item.label}</span>
+                <span className="text-xs font-medium">{item.label}</span>
               </Link>
             )
           )}

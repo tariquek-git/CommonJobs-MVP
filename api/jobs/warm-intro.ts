@@ -55,7 +55,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
       const { Resend } = await import('resend');
       const key = process.env.RESEND_API_KEY;
-      const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || 'tarique@fintechcommons.com';
+      const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || 'tariquek@gmail.com';
       if (key) {
         const resend = new Resend(key);
         const { data: job } = await supabase

@@ -77,8 +77,8 @@ export default function TermsModal({ onClose }: TermsModalProps) {
           <div>
             <h4 className="text-sm font-semibold text-gray-900 mb-1.5">Your data</h4>
             <p>
-              If you submit a job or request a warm intro, we store the info you provide (name, email, LinkedIn, message).
-              We don't sell it, share it with third parties, or use it for marketing.
+              If you submit a job or request a warm intro, I store the info you provide (name, email, LinkedIn, message).
+              I don't sell it, share it with third parties, or use it for marketing.
               Emails are only used to connect you with the relevant person. That's it.
             </p>
           </div>
@@ -87,8 +87,7 @@ export default function TermsModal({ onClose }: TermsModalProps) {
             <h4 className="text-sm font-semibold text-gray-900 mb-1.5">Don't be dumb</h4>
             <p>
               Don't post fake jobs. Don't spam warm intros. Don't scrape the site. Don't use it to harvest emails.
-              Don't do anything you wouldn't want done to you.
-              You've been on the internet long enough to know what's cool and what's not.
+              Don't do anything you wouldn't want done to you. You know the deal.
             </p>
           </div>
 
@@ -102,7 +101,7 @@ export default function TermsModal({ onClose }: TermsModalProps) {
           </div>
 
           <div className="rounded-xl bg-gray-50 border border-gray-200/60 p-4">
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-600">
               Last updated: March 2026. If you have questions, reach out to Tarique directly — there's no legal department because there's no company.
             </p>
           </div>

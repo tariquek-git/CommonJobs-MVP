@@ -47,7 +47,7 @@ export default function SortStrip({ sort, onSortChange, meta, onRefresh, tags, o
           <button
             key={cat}
             onClick={() => toggleTag(cat)}
-            className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+            className={`shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               tags.includes(cat)
                 ? 'bg-indigo-600 text-white'
                 : 'bg-gray-100 text-gray-600'
@@ -59,7 +59,7 @@ export default function SortStrip({ sort, onSortChange, meta, onRefresh, tags, o
         {tags.length > 0 && (
           <button
             onClick={() => onTagsChange([])}
-            className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-400 hover:text-gray-600"
+            className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:text-gray-700"
           >
             Clear
           </button>

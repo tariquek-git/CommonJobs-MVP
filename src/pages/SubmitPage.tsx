@@ -10,7 +10,7 @@ export default function SubmitPage() {
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-semibold text-gray-900">Submit a Role</h1>
           <p className="text-gray-500 text-sm mt-1">
-            Share a fintech or banking role with the community. Submissions are reviewed before going live.
+            Share a fintech or banking role. I review every submission before it goes live.
           </p>
         </div>
 

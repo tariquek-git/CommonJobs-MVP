@@ -58,9 +58,9 @@ describe('JobDetailModal', () => {
     expect(onClose).toHaveBeenCalledOnce();
   });
 
-  it('shows community trust cues and warm intro button', () => {
+  it('shows trust cues and warm intro button', () => {
     render(<JobDetailModal job={mockJob} onClose={() => {}} />);
-    expect(screen.getByText('Community verified')).toBeInTheDocument();
+    expect(screen.getByText('Verified')).toBeInTheDocument();
     expect(screen.getByText('Warm Intro')).toBeInTheDocument();
   });
 

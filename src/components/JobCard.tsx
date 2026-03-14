@@ -94,7 +94,7 @@ export default function JobCard({ job, onSelect }: JobCardProps) {
               <h3 className="text-base font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors leading-snug">
                 {job.title}
               </h3>
-              <p className="text-sm text-gray-500 mt-0.5">{job.company}</p>
+              <p className="text-sm font-medium text-gray-600 mt-0.5">{job.company}</p>
             </div>
             <div className="shrink-0 text-right flex items-center gap-1.5">
               {(() => {
@@ -108,7 +108,7 @@ export default function JobCard({ job, onSelect }: JobCardProps) {
                 }
                 return null;
               })()}
-              <span className="text-xs text-gray-400 tabular-nums">
+              <span className="text-xs text-gray-600 tabular-nums">
                 {getRelativeTimeLabel(job.posted_date)}
               </span>
               {(() => {
@@ -127,7 +127,7 @@ export default function JobCard({ job, onSelect }: JobCardProps) {
 
           <div className="mt-2 flex flex-wrap items-center gap-1.5">
             {job.location && (
-              <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+              <span className="inline-flex items-center gap-1 text-xs text-gray-600">
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 0115 0z" />

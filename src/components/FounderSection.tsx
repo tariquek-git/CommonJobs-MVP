@@ -18,7 +18,7 @@ export default function FounderSection() {
           aria-expanded={!collapsed}
         >
           <span className="text-sm font-semibold text-gray-700">
-            Why I built Commons Jobs
+            Why I built Fintech Commons
           </span>
           <svg
             className={`h-4 w-4 text-gray-400 transition-transform duration-300 ${
@@ -70,7 +70,7 @@ export default function FounderSection() {
             </div>
             <div className="sm:mt-2">
               <p className="text-sm font-semibold text-gray-900">A real person posts a role</p>
-              <p className="text-xs text-gray-500 leading-relaxed mt-0.5">
+              <p className="text-sm text-gray-600 leading-relaxed mt-0.5">
                 No bots, no scrapers, no algorithms. A human submitted this because they thought it was worth sharing.
               </p>
             </div>
@@ -95,7 +95,7 @@ export default function FounderSection() {
             </div>
             <div className="sm:mt-2">
               <p className="text-sm font-semibold text-gray-900">Human-reviewed, not algorithm-sorted</p>
-              <p className="text-xs text-gray-500 leading-relaxed mt-0.5">
+              <p className="text-sm text-gray-600 leading-relaxed mt-0.5">
                 Every listing is read by a person and translated from corporate-speak into plain language. No filters, no AI ranking.
               </p>
             </div>
@@ -120,8 +120,8 @@ export default function FounderSection() {
             </div>
             <div className="sm:mt-2">
               <p className="text-sm font-semibold text-gray-900">Apply direct, or ask for a warm intro</p>
-              <p className="text-xs text-gray-500 leading-relaxed mt-0.5">
-                Apply on your own, or ask for a warm intro and we'll try to get it in front of the right person.
+              <p className="text-sm text-gray-600 leading-relaxed mt-0.5">
+                Apply on your own, or ask for a warm intro and I'll try to get it in front of the right person.
               </p>
             </div>
           </div>
@@ -132,15 +132,15 @@ export default function FounderSection() {
           <svg className="h-4 w-4 text-indigo-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
           </svg>
-          <p className="text-xs text-indigo-700 leading-relaxed">
-            <span className="font-semibold">Humans in the loop, automation in the plumbing.</span> We love automation — it powers everything behind the scenes. But the trust part? That stays human. Real people post, review, and connect. Tech just makes it scale.
+          <p className="text-sm text-indigo-700 leading-relaxed">
+            I love automation — it powers everything behind the scenes. But the trust part? That stays human. Real people post, review, and connect. Tech just makes it scale.
           </p>
         </div>
       </div>
 
       {/* Pre-alpha note */}
       <div className="rounded-xl bg-amber-50/40 border border-amber-200/60 px-4 py-3">
-        <p className="text-xs text-amber-700 leading-relaxed">
+        <p className="text-sm text-amber-700 leading-relaxed">
           <span className="font-semibold">Please note:</span>{' '}
           This is pre-alpha. Things may break, look weird, or change drastically. You're seeing it early because your feedback matters more than polish right now.
         </p>

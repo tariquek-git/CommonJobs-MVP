@@ -27,7 +27,7 @@ export default function Header() {
               <span className="text-2xl font-bold tracking-tight text-gray-900 group-hover:text-indigo-600 transition-colors leading-tight">
                 {APP_NAME}
               </span>
-              <span className="text-sm text-gray-500 leading-tight hidden sm:block">
+              <span className="text-sm text-gray-600 leading-tight hidden sm:block">
                 Jobs — Fintech & Banking
               </span>
             </div>

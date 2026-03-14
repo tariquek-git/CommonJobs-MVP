@@ -3,7 +3,7 @@ export const APP_DESCRIPTION = 'Fintech & Banking Job Board';
 
 export const FEEDS = {
   community: {
-    label: 'Community Board',
+    label: 'Curated Board',
     description: 'Human-submitted roles, reviewed, warm intro possible.',
   },
 } as const;
@@ -16,6 +16,3 @@ Fintech Commons flips that. Real people post roles. A real person reviews them. 
 
 That's it. Humans in the loop, automation in the plumbing.`;
 
-export const PLEASE_NOTE = 'Please note: This is pre-alpha. Things may break, look weird, or change drastically. You\'re seeing it early because your feedback matters more than polish right now.';
-
-export const FAQ_LINE = "No FAQ needed. You've been on the internet long enough to figure this out.";

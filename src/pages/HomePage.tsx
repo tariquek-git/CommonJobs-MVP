@@ -33,7 +33,7 @@ export default function HomePage() {
         </div>
 
         {/* Footer */}
-        <footer className="border-t border-gray-100 pt-4 pb-2 flex flex-wrap items-center justify-between gap-2 text-xs text-gray-400">
+        <footer className="border-t border-gray-100 pt-4 pb-2 flex flex-wrap items-center justify-between gap-2 text-sm text-gray-600">
           <p>Fintech Commons — a hobby project by Tarique Khan. Apache 2.0.</p>
           <button
             onClick={() => setShowTerms(true)}

@@ -85,7 +85,7 @@ export default function WarmIntroModal({ job, onClose }: WarmIntroModalProps) {
             <p className="text-xs text-amber-700 leading-relaxed">
               <span className="font-semibold">Real talk:</span> Not every intro leads to a reply.
               Hiring timelines shift, roles get filled, people get busy. That's not on you.
-              I'll do my part — the rest is out of both our hands.
+              I'll do my part — the rest is out of our hands.
             </p>
           </div>
 
@@ -132,61 +132,30 @@ export default function WarmIntroModal({ job, onClose }: WarmIntroModalProps) {
               </svg>
             </button>
           </div>
-          <p className="text-sm text-gray-500 mt-1.5 ml-[50px]">
+          <p className="text-sm text-gray-600 mt-1.5 ml-[50px]">
             for <span className="font-medium text-gray-700">{job.title}</span> at {job.company}
           </p>
         </div>
 
         {/* Body */}
         <div className="p-6 space-y-4">
-          {/* How it works callout */}
+          {/* How it works */}
           <div className="rounded-xl bg-indigo-50/60 border border-indigo-200/60 p-4">
             <div className="flex gap-3">
               <div className="shrink-0 mt-0.5">
                 <svg className="h-5 w-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                 </svg>
               </div>
-              <div>
-                <p className="text-sm font-medium text-indigo-700 mb-1">
-                  I'd love to get your info in front of the right person
+              <div className="space-y-1.5">
+                <p className="text-sm font-medium text-indigo-700">
+                  I'll personally put your name in front of the right person.
                 </p>
                 <p className="text-xs text-indigo-600/80 leading-relaxed">
-                  This isn't automated. I personally review each request and reach out to the job poster on your behalf. A real intro from a real person — that's the whole point.
+                  Not automated — I review each request and reach out to the job poster on your behalf. The poster opted in, so they're expecting it. Just be genuine — real interest, real profile.
                 </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Two-sided trust callout */}
-          <div className="rounded-xl bg-emerald-50/60 border border-emerald-200/60 p-4">
-            <div className="flex gap-3">
-              <div className="shrink-0 mt-0.5">
-                <svg className="h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-xs text-emerald-700 leading-relaxed">
-                  <span className="font-semibold">Scout's honour — both sides:</span> The person who posted this role opted in to warm intros and committed to engaging in good faith when someone's info comes their way. In return, we ask that you're genuine too — real interest, real profile, real intent.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Honest expectations callout */}
-          <div className="rounded-xl bg-gray-50 border border-gray-200/60 p-4">
-            <div className="flex gap-3">
-              <div className="shrink-0 mt-0.5">
-                <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-xs text-gray-600 leading-relaxed">
-                  <span className="font-semibold">Heads up —</span> warm intros don't always lead to warm responses.
-                  Hiring is messy. People are busy. Roles change.
-                  But having a real person put your name forward? That's still more than a cold apply gets you.
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  No guarantees — hiring is messy and timelines shift. But it beats a cold apply.
                 </p>
               </div>
             </div>
@@ -227,13 +196,13 @@ export default function WarmIntroModal({ job, onClose }: WarmIntroModalProps) {
                 required
                 aria-required="true"
               />
-              <p className="text-[11px] text-gray-400 mt-1">So I can follow up with you. Never shared with anyone.</p>
+              <p className="text-[11px] text-gray-600 mt-1">So I can follow up with you. Never shared with anyone.</p>
             </div>
 
             <div>
               <label htmlFor="warm-intro-linkedin" className="block text-sm font-medium text-gray-700 mb-1.5">
                 LinkedIn
-                <span className="text-xs text-gray-400 ml-1.5 font-normal">optional, but helps</span>
+                <span className="text-xs text-gray-600 ml-1.5 font-normal">optional, but helps</span>
               </label>
               <input
                 id="warm-intro-linkedin"
@@ -248,7 +217,7 @@ export default function WarmIntroModal({ job, onClose }: WarmIntroModalProps) {
             <div>
               <label htmlFor="warm-intro-message" className="block text-sm font-medium text-gray-700 mb-1.5">
                 A bit about you
-                <span className="text-xs text-gray-400 ml-1.5 font-normal">optional</span>
+                <span className="text-xs text-gray-600 ml-1.5 font-normal">optional</span>
               </label>
               <textarea
                 id="warm-intro-message"
@@ -259,7 +228,7 @@ export default function WarmIntroModal({ job, onClose }: WarmIntroModalProps) {
                 maxLength={500}
                 placeholder="Who you are, why this role caught your eye, anything you'd want the hiring person to know..."
               />
-              <p className="text-[11px] text-gray-400 mt-1">This goes directly to the job poster along with your intro.</p>
+              <p className="text-[11px] text-gray-600 mt-1">This goes directly to the job poster along with your intro.</p>
             </div>
           </div>
 
@@ -275,7 +244,7 @@ export default function WarmIntroModal({ job, onClose }: WarmIntroModalProps) {
 
         {/* Footer */}
         <div className="flex items-center justify-between p-6 border-t border-gray-200/60 bg-gray-50/50">
-          <p className="text-[11px] text-gray-400 hidden sm:block">
+          <p className="text-[11px] text-gray-600 hidden sm:block">
             Scout's honour — I'll get this in front of the right person.
           </p>
           <div className="flex items-center gap-3 ml-auto">

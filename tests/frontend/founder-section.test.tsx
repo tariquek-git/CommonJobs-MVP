@@ -9,7 +9,7 @@ describe('FounderSection', () => {
 
   it('renders collapsed toggle text', () => {
     render(<FounderSection />);
-    expect(screen.getByText('Why I built Commons Jobs')).toBeInTheDocument();
+    expect(screen.getByText('Why I built Fintech Commons')).toBeInTheDocument();
   });
 
   it('starts collapsed by default (text in DOM but visually hidden)', () => {
@@ -20,7 +20,7 @@ describe('FounderSection', () => {
 
   it('expands on click and persists to localStorage', () => {
     render(<FounderSection />);
-    const toggleBtn = screen.getByText('Why I built Commons Jobs');
+    const toggleBtn = screen.getByText('Why I built Fintech Commons');
     fireEvent.click(toggleBtn);
 
     // Founder text is now visible (no max-h-0)

@@ -40,7 +40,7 @@ export async function sendApprovalEmail(to: string, job: Job): Promise<boolean> 
         <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
           <h2 style="color: #0A1628; margin-bottom: 8px;">Your job is live on Fintech Commons</h2>
           <p style="color: #64748B; font-size: 15px; line-height: 1.6;">
-            Great news — <strong>${safeTitle}</strong> at <strong>${safeCompany}</strong> has been reviewed and approved by our community moderators.
+            Great news — I've reviewed <strong>${safeTitle}</strong> at <strong>${safeCompany}</strong> and it's now approved.
           </p>
           <p style="color: #64748B; font-size: 15px; line-height: 1.6;">
             It's now visible to job seekers on the Fintech Commons board.
@@ -49,11 +49,11 @@ export async function sendApprovalEmail(to: string, job: Job): Promise<boolean> 
             View your posting
           </a>
           <p style="color: #94A3B8; font-size: 13px; margin-top: 24px;">
-            — The Fintech Commons team
+            — Tarique, Fintech Commons
           </p>
         </div>
       `,
-      text: `Your job posting "${job.title}" at ${job.company} is now live on Fintech Commons!\n\nView it here: ${jobUrl}\n\n— The Fintech Commons team`,
+      text: `Your job posting "${job.title}" at ${job.company} is now live on Fintech Commons!\n\nView it here: ${jobUrl}\n\n— Tarique, Fintech Commons`,
     });
     return true;
   } catch (err) {

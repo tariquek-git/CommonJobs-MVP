@@ -165,10 +165,10 @@ export default function SubmitForm() {
           </svg>
         </div>
         <h2 className="text-xl font-semibold text-gray-900 mb-2">You're in the queue</h2>
-        <p className="text-gray-500 text-sm mb-1">{result.message}</p>
-        <p className="text-gray-400 text-xs mb-4">I'll personally review this and get it live as soon as I can. No bots here.</p>
+        <p className="text-gray-600 text-sm mb-1">{result.message}</p>
+        <p className="text-gray-600 text-xs mb-4">I'll personally review this and get it live as soon as I can. No bots here.</p>
         <div className="surface-tinted p-4 inline-block rounded-xl">
-          <p className="text-xs text-gray-400 mb-1">Reference ID</p>
+          <p className="text-xs text-gray-600 mb-1">Reference ID</p>
           <p className="text-lg font-mono font-bold text-indigo-600">{result.ref}</p>
         </div>
         <button
@@ -220,7 +220,7 @@ export default function SubmitForm() {
                   <p className="text-sm font-medium text-indigo-700 mb-0.5">Scout's honour</p>
                   <p className="text-xs text-gray-600 leading-relaxed">
                     Every role posted here is personally reviewed before it goes live.
-                    No spam, no ghost listings, no roles that expired three months ago.
+                    No spam, no ghost listings.
                     If it's on the board, it's real.
                   </p>
                 </div>
@@ -300,7 +300,7 @@ export default function SubmitForm() {
                 onChange={(e) => updateField('description', e.target.value)}
                 rows={8}
                 className="input-field resize-y"
-                placeholder="Paste the original job description here (corporate-speak welcome — we'll humanize it next)..."
+                placeholder="Paste the original job description here (corporate-speak welcome — I'll humanize it next)..."
               />
             </div>
 
@@ -338,7 +338,7 @@ export default function SubmitForm() {
               </button>
             </div>
 
-            <p className="text-xs text-gray-500 -mt-3">
+            <p className="text-xs text-gray-600 -mt-3">
               AI rewrites the corporate description into plain language tailored to the role and highlights standout perks.
             </p>
 
@@ -359,7 +359,7 @@ export default function SubmitForm() {
             <div>
               <label htmlFor="submit-perk-input" className="block text-sm font-medium text-gray-700 mb-1.5">
                 Standout Perks
-                <span className="text-xs text-gray-400 ml-2 font-normal">Beyond the usual 401k, dental, vision</span>
+                <span className="text-xs text-gray-600 ml-2 font-normal">Beyond the usual 401k, dental, vision</span>
               </label>
               {form.standout_perks && form.standout_perks.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-2">
@@ -390,11 +390,11 @@ export default function SubmitForm() {
 
             {/* Preview card */}
             <div>
-              <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Preview</p>
+              <p className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-2">Preview</p>
               <div className="surface-elevated p-5 relative overflow-hidden">
                 <h4 className="font-semibold text-gray-900">{form.title || 'Untitled'}</h4>
-                <p className="text-sm text-gray-500 mt-0.5">{form.company || 'No company'}</p>
-                {form.location && <p className="text-xs text-gray-400 mt-1">{form.location}{form.country ? `, ${form.country}` : ''}</p>}
+                <p className="text-sm text-gray-600 mt-0.5">{form.company || 'No company'}</p>
+                {form.location && <p className="text-xs text-gray-600 mt-1">{form.location}{form.country ? `, ${form.country}` : ''}</p>}
                 {form.summary && <p className="text-sm text-gray-600 leading-relaxed mt-2 line-clamp-3">{form.summary}</p>}
                 {form.standout_perks && form.standout_perks.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mt-2">
@@ -407,7 +407,7 @@ export default function SubmitForm() {
                       </span>
                     ))}
                     {form.standout_perks.length > 3 && (
-                      <span className="text-xs text-gray-400">+{form.standout_perks.length - 3} more</span>
+                      <span className="text-xs text-gray-600">+{form.standout_perks.length - 3} more</span>
                     )}
                   </div>
                 )}
@@ -443,7 +443,7 @@ export default function SubmitForm() {
                           <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <p className="text-xs text-indigo-700 leading-relaxed">
-                          <span className="font-semibold">Scout's honour:</span> By opting in, you're committing to take a look when someone's info lands in your inbox. You don't have to hire them — just engage in good faith. That's what makes this work.
+                          <span className="font-semibold">The deal:</span> By opting in, you're committing to look when a candidate reaches out. You don't have to hire them — just engage in good faith. That's what makes this work.
                         </p>
                       </div>
                     </div>
@@ -460,7 +460,7 @@ export default function SubmitForm() {
                 </svg>
                 <p className="text-sm font-medium text-gray-700">A bit about you</p>
               </div>
-              <p className="text-xs text-gray-500 leading-relaxed -mt-1">
+              <p className="text-xs text-gray-600 leading-relaxed -mt-1">
                 So I can let you know when it's live and connect candidates who want a warm intro. Never shared publicly.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

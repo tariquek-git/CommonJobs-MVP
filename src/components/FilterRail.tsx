@@ -23,7 +23,7 @@ export default function FilterRail({ sort, onSortChange, meta, tags, onTagsChang
     <aside className="hidden lg:block w-56 shrink-0">
       <div className="sticky top-24 space-y-6">
         <div>
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Sort by</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">Sort by</h3>
           <div className="space-y-1">
             {(['newest', 'oldest'] as SortOption[]).map((option) => (
               <button
@@ -42,7 +42,7 @@ export default function FilterRail({ sort, onSortChange, meta, tags, onTagsChang
         </div>
 
         <div>
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Category</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3">Category</h3>
           <div className="space-y-1">
             {CATEGORIES.map((cat) => (
               <button
@@ -60,7 +60,7 @@ export default function FilterRail({ sort, onSortChange, meta, tags, onTagsChang
             {tags.length > 0 && (
               <button
                 onClick={() => onTagsChange([])}
-                className="w-full text-left px-3 py-2 rounded-lg text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                className="w-full text-left px-3 py-2 rounded-lg text-xs text-gray-600 hover:text-gray-700 transition-colors"
               >
                 Clear filters
               </button>
@@ -70,15 +70,15 @@ export default function FilterRail({ sort, onSortChange, meta, tags, onTagsChang
 
         {meta && (
           <div className="surface-tinted p-4">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Feed Info</h3>
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Feed Info</h3>
             <p className="text-sm text-gray-700 font-bold text-indigo-600">
               {roleCount} {meta.total === 1 ? 'role' : 'roles'}
             </p>
           </div>
         )}
 
-        <div className="text-xs text-gray-400 leading-relaxed">
-          Community Board shows human-submitted, reviewed roles with possible warm intros.
+        <div className="text-sm text-gray-600 leading-relaxed">
+          Real roles, reviewed by a real person. Warm intros available.
         </div>
       </div>
     </aside>

@@ -1,3 +1,6 @@
+-- ⚠️  DEPRECATED — Use scripts/setup-database.sql instead.
+-- That script is a complete, idempotent setup that includes everything here and more.
+--
 -- Migration 001: Email logs, analytics columns, missing indexes, warm_intro_ok fix
 -- Run this in Supabase SQL Editor
 

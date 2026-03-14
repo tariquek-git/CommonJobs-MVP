@@ -1,21 +1,5 @@
 -- Seed 10 realistic fintech/banking jobs for Fintech Commons
--- Run this in Supabase SQL Editor after creating the tables
-
--- Also ensure required columns exist
-ALTER TABLE jobs ADD COLUMN IF NOT EXISTS standout_perks TEXT[] DEFAULT '{}';
-ALTER TABLE jobs ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ;
-ALTER TABLE jobs ADD COLUMN IF NOT EXISTS submitter_name TEXT;
-
--- Create warm_intros table
-CREATE TABLE IF NOT EXISTS warm_intros (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  job_id UUID REFERENCES jobs(id),
-  name TEXT NOT NULL,
-  email TEXT NOT NULL,
-  linkedin TEXT,
-  message TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
+-- Prerequisites: Run scripts/setup-database.sql first to create all tables and columns.
 
 INSERT INTO jobs (title, company, location, country, description, summary, apply_url, company_url, company_logo_url, source_type, source_name, status, posted_date, expires_at, submission_ref, submitter_name, submitter_email, tags, standout_perks, warm_intro_ok) VALUES
 

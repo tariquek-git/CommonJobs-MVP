@@ -159,3 +159,35 @@ export async function getAnalytics(token: string): Promise<AnalyticsData> {
     headers: authHeaders(token),
   });
 }
+
+// ── Warm Intros Admin API ──
+
+export interface WarmIntroRecord {
+  id: string;
+  name: string;
+  email: string;
+  linkedin: string | null;
+  message: string | null;
+  status: string;
+  created_at: string;
+  job_id: string;
+  job_title: string;
+  job_company: string;
+  job_submitter_email: string | null;
+  job_submitter_name: string | null;
+}
+
+export async function getWarmIntros(token: string, status?: string): Promise<{ intros: WarmIntroRecord[] }> {
+  const params = status ? `?status=${encodeURIComponent(status)}` : '';
+  return request(`/admin/warm-intros${params}`, {
+    headers: authHeaders(token),
+  });
+}
+
+export async function updateWarmIntroStatus(token: string, id: string, status: string): Promise<{ success: boolean }> {
+  return request(`/admin/warm-intros/${id}/status`, {
+    method: 'PATCH',
+    headers: authHeaders(token),
+    body: JSON.stringify({ status }),
+  });
+}

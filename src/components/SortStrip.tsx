@@ -1,4 +1,5 @@
 import type { SortOption, SearchMeta } from '../lib/types';
+import { usePostHog } from '@posthog/react';
 
 const CATEGORIES = ['Engineering', 'Product', 'Operations', 'Sales/BD', 'Remote'];
 
@@ -12,8 +13,25 @@ interface SortStripProps {
 }
 
 export default function SortStrip({ sort, onSortChange, meta, onRefresh, tags, onTagsChange }: SortStripProps) {
+  const posthog = usePostHog();
+
   const toggleTag = (tag: string) => {
-    onTagsChange(tags.includes(tag) ? tags.filter((t) => t !== tag) : [...tags, tag]);
+    const newTags = tags.includes(tag) ? tags.filter((t) => t !== tag) : [...tags, tag];
+    posthog?.capture('job_filter_applied', {
+      filter_type: 'tag',
+      tag,
+      action: tags.includes(tag) ? 'removed' : 'added',
+      active_tags: newTags,
+    });
+    onTagsChange(newTags);
+  };
+
+  const handleSortChange = (value: SortOption) => {
+    posthog?.capture('job_filter_applied', {
+      filter_type: 'sort',
+      sort: value,
+    });
+    onSortChange(value);
   };
 
   return (
@@ -25,7 +43,7 @@ export default function SortStrip({ sort, onSortChange, meta, onRefresh, tags, o
           </span>
           <select
             value={sort}
-            onChange={(e) => onSortChange(e.target.value as SortOption)}
+            onChange={(e) => handleSortChange(e.target.value as SortOption)}
             className="bg-white border border-gray-200 rounded-lg text-sm text-gray-700 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
           >
             <option value="newest">Newest first</option>

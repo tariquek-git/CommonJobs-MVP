@@ -72,10 +72,13 @@ CREATE INDEX IF NOT EXISTS idx_clicks_job_clicked ON clicks(job_id, clicked_at D
 -- ============================================================
 ALTER TABLE warm_intros ENABLE ROW LEVEL SECURITY;
 
--- Public can insert (submit warm intro requests)
-CREATE POLICY IF NOT EXISTS warm_intros_public_insert ON warm_intros
-  FOR INSERT WITH CHECK (true);
-
--- Service role can do everything
-CREATE POLICY IF NOT EXISTS warm_intros_service_all ON warm_intros
-  FOR ALL USING (auth.role() = 'service_role');
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'warm_intros' AND policyname = 'warm_intros_public_insert') THEN
+    CREATE POLICY warm_intros_public_insert ON warm_intros FOR INSERT WITH CHECK (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'warm_intros' AND policyname = 'warm_intros_service_all') THEN
+    CREATE POLICY warm_intros_service_all ON warm_intros FOR ALL USING (auth.role() = 'service_role');
+  END IF;
+END
+$$;

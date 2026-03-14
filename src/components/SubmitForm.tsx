@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { submitJob, scrapeUrl, humanizeJob } from '../lib/api';
 import type { SubmissionPayload } from '../lib/types';
 import { useToast } from './Toast';
+import { usePostHog } from '@posthog/react';
 
 const STEPS = [
   { label: 'Details', icon: '1' },
@@ -43,6 +44,7 @@ function StepIndicator({ current, total }: { current: number; total: number }) {
 
 export default function SubmitForm() {
   const { toast } = useToast();
+  const posthog = usePostHog();
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<SubmissionPayload>({
     title: '',
@@ -104,6 +106,10 @@ export default function SubmitForm() {
     if (!form.description || !form.title) return;
     setHumanizing(true);
     setAiFallback(false);
+    posthog?.capture('job_submission_ai_humanize_used', {
+      job_title: form.title,
+      company: form.company,
+    });
     try {
       const res = await humanizeJob(form.description, form.title);
       if (res.fallback || !res.result.humanized_description) {
@@ -116,7 +122,8 @@ export default function SubmitForm() {
         }
         toast('Job post humanized!', 'success');
       }
-    } catch {
+    } catch (err) {
+      posthog?.captureException(err instanceof Error ? err : new Error(String(err)));
       setAiFallback(true);
       toast('AI humanizer unavailable', 'error');
     } finally {
@@ -142,9 +149,19 @@ export default function SubmitForm() {
     try {
       const payload: SubmissionPayload & { website?: string } = { ...form, website };
       const res = await submitJob(payload);
+      posthog?.capture('job_submitted', {
+        job_title: form.title,
+        company: form.company,
+        location: form.location,
+        has_warm_intro: form.warm_intro_ok,
+        has_ai_summary: !!form.summary,
+        standout_perks_count: form.standout_perks?.length ?? 0,
+        submission_ref: res.submission_ref,
+      });
       setResult({ ref: res.submission_ref, message: res.message });
       toast('Submission successful!', 'success');
     } catch (err) {
+      posthog?.captureException(err instanceof Error ? err : new Error(String(err)));
       toast(err instanceof Error ? err.message : 'Submission failed', 'error');
     } finally {
       setSubmitting(false);
@@ -501,7 +518,15 @@ export default function SubmitForm() {
         {step < STEPS.length - 1 ? (
           <button
             type="button"
-            onClick={() => setStep((s) => s + 1)}
+            onClick={() => {
+              posthog?.capture('job_submission_step_completed', {
+                step: step + 1,
+                step_name: STEPS[step].label,
+                job_title: form.title,
+                company: form.company,
+              });
+              setStep((s) => s + 1);
+            }}
             disabled={!canProceed(step)}
             className="btn-primary disabled:opacity-40"
           >

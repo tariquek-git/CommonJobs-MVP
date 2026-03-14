@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getJob, trackClick } from '../lib/api';
 import type { Job } from '../lib/types';
+import { usePostHog } from '@posthog/react';
 
 function JsonLd({ job }: { job: Job }) {
   const schema = {
@@ -44,6 +45,7 @@ export default function JobPage() {
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const posthog = usePostHog();
 
   useEffect(() => {
     if (!id) return;
@@ -66,6 +68,12 @@ export default function JobPage() {
   const handleApply = () => {
     if (job?.apply_url) {
       trackClick(job.id);
+      posthog?.capture('job_apply_clicked', {
+        job_id: job.id,
+        job_title: job.title,
+        company: job.company,
+        source: 'job_page',
+      });
       window.open(job.apply_url, '_blank', 'noopener,noreferrer');
     }
   };

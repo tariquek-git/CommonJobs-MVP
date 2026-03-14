@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { requestWarmIntro } from '../lib/api';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import type { Job } from '../lib/types';
+import { usePostHog } from '@posthog/react';
 
 interface WarmIntroModalProps {
   job: Job;
@@ -18,6 +19,7 @@ export default function WarmIntroModal({ job, onClose }: WarmIntroModalProps) {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
   const isMobile = useMediaQuery('(max-width: 1023px)');
+  const posthog = usePostHog();
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -42,8 +44,16 @@ export default function WarmIntroModal({ job, onClose }: WarmIntroModalProps) {
         linkedin: linkedin.trim() || undefined,
         message: message.trim() || undefined,
       });
+      posthog?.capture('warm_intro_requested', {
+        job_id: job.id,
+        job_title: job.title,
+        company: job.company,
+        has_linkedin: !!linkedin.trim(),
+        has_message: !!message.trim(),
+      });
       setSubmitted(true);
     } catch (err) {
+      posthog?.captureException(err instanceof Error ? err : new Error(String(err)));
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
       setSubmitting(false);

@@ -4,6 +4,7 @@ import { formatDate, getRelativeTimeLabel } from '../lib/date';
 import { trackClick } from '../lib/api';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import WarmIntroModal from './WarmIntroModal';
+import { usePostHog } from '@posthog/react';
 
 interface JobDetailModalProps {
   job: Job | null;
@@ -53,9 +54,18 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const [showIntro, setShowIntro] = useState(false);
   const isMobile = useMediaQuery('(max-width: 1023px)');
+  const posthog = usePostHog();
 
   useEffect(() => {
     if (!job) return;
+
+    posthog?.capture('job_detail_viewed', {
+      job_id: job.id,
+      job_title: job.title,
+      company: job.company,
+      location: job.location,
+      has_warm_intro: job.warm_intro_ok,
+    });
 
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -79,8 +89,23 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
   const handleApply = () => {
     if (job.apply_url) {
       trackClick(job.id);
+      posthog?.capture('job_apply_clicked', {
+        job_id: job.id,
+        job_title: job.title,
+        company: job.company,
+        source: 'modal',
+      });
       window.open(job.apply_url, '_blank', 'noopener,noreferrer');
     }
+  };
+
+  const handleWarmIntroOpen = () => {
+    posthog?.capture('warm_intro_modal_opened', {
+      job_id: job.id,
+      job_title: job.title,
+      company: job.company,
+    });
+    setShowIntro(true);
   };
 
   return (
@@ -271,7 +296,7 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
               Close
             </button>
             <button
-              onClick={() => setShowIntro(true)}
+              onClick={handleWarmIntroOpen}
               className="btn-secondary border-indigo-300 text-indigo-700 hover:bg-indigo-50"
             >
               <svg className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

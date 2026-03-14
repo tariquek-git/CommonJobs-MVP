@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAdmin } from '../hooks/useAdmin';
-import { getAnalytics } from '../lib/api';
-import type { AnalyticsData } from '../lib/api';
+import { getAnalytics, getWarmIntros, updateWarmIntroStatus } from '../lib/api';
+import type { AnalyticsData, WarmIntroRecord } from '../lib/api';
 import type { Job } from '../lib/types';
 import { getRelativeTimeLabel } from '../lib/date';
 
@@ -237,13 +237,191 @@ function AnalyticsTab({ token }: { token: string }) {
   );
 }
 
+const INTRO_STATUSES = ['pending', 'contacted', 'connected', 'no_response'] as const;
+
+function IntroStatusBadge({ status }: { status: string }) {
+  const styles: Record<string, string> = {
+    pending: 'bg-amber-50 text-amber-700 border border-amber-200',
+    contacted: 'bg-blue-50 text-blue-700 border border-blue-200',
+    connected: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+    no_response: 'bg-gray-100 text-gray-500 border border-gray-200',
+  };
+  const labels: Record<string, string> = {
+    pending: 'Pending',
+    contacted: 'Contacted',
+    connected: 'Connected',
+    no_response: 'No Response',
+  };
+  return (
+    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${styles[status] || styles.pending}`}>
+      {labels[status] || status}
+    </span>
+  );
+}
+
+function IntroCard({ intro, onStatusChange }: { intro: WarmIntroRecord; onStatusChange: (id: string, status: string) => void }) {
+  return (
+    <div className="surface-elevated p-4 space-y-3">
+      {/* Header: requester + date */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h3 className="text-sm font-semibold text-gray-900">{intro.name}</h3>
+          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+            <a href={`mailto:${intro.email}`} className="text-xs text-indigo-600 hover:underline">{intro.email}</a>
+            {intro.linkedin && (
+              <a href={intro.linkedin} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">
+                LinkedIn
+              </a>
+            )}
+          </div>
+        </div>
+        <div className="text-right shrink-0">
+          <IntroStatusBadge status={intro.status} />
+          <p className="text-[10px] text-gray-400 mt-1">{getRelativeTimeLabel(intro.created_at)}</p>
+        </div>
+      </div>
+
+      {/* Message */}
+      {intro.message && (
+        <p className="text-sm text-gray-600 bg-gray-50 rounded-lg p-3 italic">"{intro.message}"</p>
+      )}
+
+      {/* Job info */}
+      <div className="text-xs text-gray-500 space-y-0.5">
+        <p>
+          <span className="text-gray-400">Wants intro to:</span>{' '}
+          <span className="text-gray-900 font-medium">{intro.job_title}</span> at{' '}
+          <span className="text-gray-900 font-medium">{intro.job_company}</span>
+        </p>
+        {intro.job_submitter_email && (
+          <p>
+            <span className="text-gray-400">Job posted by:</span>{' '}
+            <a href={`mailto:${intro.job_submitter_email}`} className="text-indigo-600 hover:underline">
+              {intro.job_submitter_name || intro.job_submitter_email}
+            </a>
+          </p>
+        )}
+      </div>
+
+      {/* Status actions */}
+      <div className="flex items-center gap-1.5 pt-1 border-t border-gray-100">
+        {INTRO_STATUSES.filter((s) => s !== intro.status).map((s) => {
+          const labels: Record<string, string> = {
+            pending: 'Pending',
+            contacted: 'Contacted',
+            connected: 'Connected',
+            no_response: 'No Response',
+          };
+          const colors: Record<string, string> = {
+            pending: 'bg-amber-50 text-amber-700 hover:bg-amber-100',
+            contacted: 'bg-blue-50 text-blue-700 hover:bg-blue-100',
+            connected: 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100',
+            no_response: 'bg-gray-100 text-gray-600 hover:bg-gray-200',
+          };
+          return (
+            <button
+              key={s}
+              onClick={() => onStatusChange(intro.id, s)}
+              className={`text-xs px-2.5 py-1.5 rounded-lg transition-colors ${colors[s]}`}
+            >
+              {labels[s]}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function WarmIntrosTab({ token }: { token: string }) {
+  const [intros, setIntros] = useState<WarmIntroRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [tabError, setTabError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<string>('');
+
+  const fetchIntros = useCallback(async () => {
+    setLoading(true);
+    setTabError(null);
+    try {
+      const result = await getWarmIntros(token, filter || undefined);
+      setIntros(result.intros);
+    } catch (err) {
+      setTabError(err instanceof Error ? err.message : 'Failed to load warm intros');
+    } finally {
+      setLoading(false);
+    }
+  }, [token, filter]);
+
+  useEffect(() => {
+    fetchIntros();
+  }, [fetchIntros]);
+
+  const handleStatusChange = async (id: string, status: string) => {
+    try {
+      await updateWarmIntroStatus(token, id, status);
+      setIntros((prev) => prev.map((intro) => (intro.id === id ? { ...intro, status } : intro)));
+    } catch (err) {
+      setTabError(err instanceof Error ? err.message : 'Failed to update status');
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Filter tabs */}
+      <div className="flex gap-1 rounded-xl bg-gray-100/60 p-1">
+        {['', 'pending', 'contacted', 'connected', 'no_response'].map((s) => {
+          const labels: Record<string, string> = {
+            '': 'All',
+            pending: 'Pending',
+            contacted: 'Contacted',
+            connected: 'Connected',
+            no_response: 'No Response',
+          };
+          return (
+            <button
+              key={s || 'all'}
+              onClick={() => setFilter(s)}
+              className={`flex-1 rounded-lg px-3 py-2 text-xs font-medium transition-all ${
+                filter === s
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-900'
+              }`}
+            >
+              {labels[s]}
+            </button>
+          );
+        })}
+      </div>
+
+      {tabError && (
+        <div className="rounded-xl bg-red-50 border border-red-200 p-3">
+          <p className="text-sm text-red-700">{tabError}</p>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="text-center text-gray-500 py-8">Loading warm intros...</div>
+      ) : intros.length === 0 ? (
+        <div className="text-center text-gray-500 py-8">No warm intro requests{filter ? ` with status "${filter}"` : ''}.</div>
+      ) : (
+        <div className="space-y-3">
+          {intros.map((intro) => (
+            <IntroCard key={intro.id} intro={intro} onStatusChange={handleStatusChange} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AdminPanel() {
   const {
     token, jobs, runtime, loading, error,
     statusFilter, login, logout,
     setStatusFilter, changeJobStatus, refreshJobs,
   } = useAdmin();
-  const [activeTab, setActiveTab] = useState<'jobs' | 'analytics'>('jobs');
+  const [activeTab, setActiveTab] = useState<'jobs' | 'intros' | 'analytics'>('jobs');
+  const [introsKey, setIntrosKey] = useState(0);
 
   if (!token) {
     return <LoginForm onLogin={login} loading={loading} error={error} />;
@@ -256,29 +434,39 @@ export default function AdminPanel() {
         <h2 className="text-xl font-semibold text-gray-900">Admin Panel</h2>
         <div className="flex items-center gap-3">
           {activeTab === 'jobs' && <button onClick={refreshJobs} className="btn-ghost text-xs">Refresh</button>}
+          {activeTab === 'intros' && <button onClick={() => setIntrosKey((k) => k + 1)} className="btn-ghost text-xs">Refresh</button>}
           <button onClick={logout} className="btn-ghost text-xs text-red-600">Logout</button>
         </div>
       </div>
 
       {/* Tab switcher */}
       <div className="flex gap-1 rounded-xl bg-gray-100/60 p-1">
-        {(['jobs', 'analytics'] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`flex-1 rounded-lg px-3 py-2 text-xs font-medium transition-all capitalize ${
-              activeTab === tab
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-500 hover:text-gray-900'
-            }`}
-          >
-            {tab === 'jobs' ? 'Job Management' : 'Analytics'}
-          </button>
-        ))}
+        {(['jobs', 'intros', 'analytics'] as const).map((tab) => {
+          const labels: Record<string, string> = {
+            jobs: 'Jobs',
+            intros: 'Warm Intros',
+            analytics: 'Analytics',
+          };
+          return (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex-1 rounded-lg px-3 py-2 text-xs font-medium transition-all ${
+                activeTab === tab
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-900'
+              }`}
+            >
+              {labels[tab]}
+            </button>
+          );
+        })}
       </div>
 
       {activeTab === 'analytics' ? (
         <AnalyticsTab token={token} />
+      ) : activeTab === 'intros' ? (
+        <WarmIntrosTab key={introsKey} token={token} />
       ) : (
         <>
           {/* Runtime info */}

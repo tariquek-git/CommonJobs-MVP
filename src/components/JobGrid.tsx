@@ -11,9 +11,9 @@ interface JobGridProps {
 
 function SkeletonCard() {
   return (
-    <div className="surface-elevated p-5 overflow-hidden">
-      <div className="flex items-start gap-3.5">
-        <div className="h-12 w-12 rounded-xl bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer" />
+    <div className="surface-elevated p-6 lg:p-7 overflow-hidden">
+      <div className="flex items-start gap-4">
+        <div className="h-14 w-14 rounded-xl bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer" />
         <div className="flex-1 space-y-3">
           <div className="h-4 w-3/4 rounded-lg bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer" />
           <div className="h-3 w-1/2 rounded-lg bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer" />
@@ -28,8 +28,8 @@ function SkeletonCard() {
 export default function JobGrid({ jobs, loading, error, onSelectJob }: JobGridProps) {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-3 lg:gap-5">
-        {Array.from({ length: 6 }).map((_, i) => (
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
+        {Array.from({ length: 4 }).map((_, i) => (
           <SkeletonCard key={i} />
         ))}
       </div>
@@ -70,7 +70,7 @@ export default function JobGrid({ jobs, loading, error, onSelectJob }: JobGridPr
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-3 lg:gap-5">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
       {jobs.map((job, i) => (
         <div
           key={job.id}

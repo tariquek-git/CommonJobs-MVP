@@ -160,7 +160,6 @@ async function notifyAdmin(payload: SubmissionPayload, ref: string, jobId?: stri
 
     // Log failed email
     try {
-      const supabase = getSupabase();
       const sb = getSupabase();
       await sb.from('email_logs').insert({
         event_type: 'submission_notification',

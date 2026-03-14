@@ -24,7 +24,7 @@ function CompanyLogo({ job }: { job: Job }) {
       <img
         src={logoUrl}
         alt={`${job.company} logo`}
-        className="h-12 w-12 rounded-xl object-contain bg-gray-100 p-1.5"
+        className="h-14 w-14 rounded-xl object-contain bg-gray-100 p-1.5"
         onError={(e) => {
           (e.target as HTMLImageElement).style.display = 'none';
           (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
@@ -38,7 +38,7 @@ function CompanyLogo({ job }: { job: Job }) {
 function FallbackIcon({ company }: { company: string }) {
   const letter = company.charAt(0).toUpperCase();
   return (
-    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-sm font-bold text-indigo-600">
+    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-indigo-50 text-base font-bold text-indigo-600">
       {letter}
     </div>
   );
@@ -62,7 +62,7 @@ export default function JobCard({ job, onSelect }: JobCardProps) {
   return (
     <article
       onClick={() => onSelect(job)}
-      className="relative surface-elevated p-5 cursor-pointer overflow-hidden
+      className="relative surface-elevated p-6 lg:p-7 cursor-pointer overflow-hidden
         hover:shadow-md hover:border-indigo-300 hover:-translate-y-0.5
         transition-all duration-300 ease-out group"
       role="button"
@@ -74,7 +74,7 @@ export default function JobCard({ job, onSelect }: JobCardProps) {
         }
       }}
     >
-      <div className="flex items-start gap-3.5">
+      <div className="flex items-start gap-4">
         <div className="shrink-0">
           {getAutoLogoUrl(job) ? (
             <>
@@ -89,12 +89,12 @@ export default function JobCard({ job, onSelect }: JobCardProps) {
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-2">
+          <div className="flex items-start justify-between gap-3">
             <div>
-              <h3 className="text-base font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors leading-snug">
+              <h3 className="text-lg font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors leading-snug">
                 {job.title}
               </h3>
-              <p className="text-sm font-medium text-gray-600 mt-0.5">{job.company}</p>
+              <p className="text-sm font-medium text-gray-600 mt-1">{job.company}</p>
             </div>
             <div className="shrink-0 text-right flex items-center gap-1.5">
               {(() => {
@@ -125,9 +125,9 @@ export default function JobCard({ job, onSelect }: JobCardProps) {
             </div>
           </div>
 
-          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          <div className="mt-3 flex flex-wrap items-center gap-2">
             {job.location && (
-              <span className="inline-flex items-center gap-1 text-xs text-gray-600">
+              <span className="inline-flex items-center gap-1 text-sm text-gray-600">
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 0115 0z" />
@@ -138,7 +138,7 @@ export default function JobCard({ job, onSelect }: JobCardProps) {
           </div>
 
           {job.standout_perks && job.standout_perks.length > 0 && (
-            <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+            <div className="mt-2.5 flex flex-wrap items-center gap-2">
               {job.standout_perks.slice(0, 3).map((perk) => (
                 <span
                   key={perk}
@@ -159,12 +159,12 @@ export default function JobCard({ job, onSelect }: JobCardProps) {
           )}
 
           {job.summary && (
-            <p className="mt-2.5 text-sm text-gray-600 leading-relaxed line-clamp-2">
+            <p className="mt-3 text-sm text-gray-600 leading-relaxed line-clamp-3">
               {job.summary}
             </p>
           )}
 
-          <div className="mt-3 flex items-center justify-between">
+          <div className="mt-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               {job.tags?.includes('example') && (
                 <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700 border border-amber-200/60">

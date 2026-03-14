@@ -13,9 +13,11 @@
   },
   "dependencies": {
     "@google/genai": "^1.1.0",
+    "@posthog/react": "^1.8.2",
     "@supabase/supabase-js": "^2.49.0",
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2",
+    "posthog-js": "^1.360.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.0",

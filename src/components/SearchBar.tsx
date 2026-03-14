@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { usePostHog } from '@posthog/react';
 
 interface SearchBarProps {
   value: string;
@@ -9,6 +10,7 @@ interface SearchBarProps {
 export default function SearchBar({ value, onChange, placeholder = 'Search roles, companies, skills...' }: SearchBarProps) {
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const posthog = usePostHog();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -34,7 +36,12 @@ export default function SearchBar({ value, onChange, placeholder = 'Search roles
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
+        onBlur={() => {
+          setFocused(false);
+          if (value.trim()) {
+            posthog?.capture('job_search_performed', { query: value.trim() });
+          }
+        }}
         placeholder={placeholder}
         className="input-field pl-10 pr-12 py-3 text-base rounded-xl"
       />

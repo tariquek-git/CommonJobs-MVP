@@ -1,29 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAdmin } from '../hooks/useAdmin';
 import { getAnalytics, getWarmIntros, updateWarmIntroStatus } from '../lib/api';
 import type { AnalyticsData, WarmIntroRecord } from '../lib/api';
 import type { Job } from '../lib/types';
 import { getRelativeTimeLabel } from '../lib/date';
-
-declare global {
-  interface Window {
-    google?: {
-      accounts: {
-        id: {
-          initialize: (config: {
-            client_id: string;
-            callback: (response: { credential: string }) => void;
-            auto_select?: boolean;
-          }) => void;
-          renderButton: (
-            element: HTMLElement,
-            config: { theme?: string; size?: string; width?: number; text?: string; shape?: string }
-          ) => void;
-        };
-      };
-    };
-  }
-}
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
@@ -32,51 +12,30 @@ function GoogleLoginForm({ onGoogleLogin, loading, error }: {
   loading: boolean;
   error: string | null;
 }) {
-  const buttonRef = useRef<HTMLDivElement>(null);
-  const callbackRef = useRef(onGoogleLogin);
-  callbackRef.current = onGoogleLogin;
-  const [gsiReady, setGsiReady] = useState(false);
-
-  // Wait for Google script to load
+  // Handle the OAuth callback — Google redirects back with id_token in the hash
   useEffect(() => {
-    if (window.google?.accounts?.id) {
-      setGsiReady(true);
-      return;
-    }
-    const interval = setInterval(() => {
-      if (window.google?.accounts?.id) {
-        setGsiReady(true);
-        clearInterval(interval);
+    const hash = window.location.hash;
+    if (hash.includes('id_token=')) {
+      const params = new URLSearchParams(hash.substring(1));
+      const idToken = params.get('id_token');
+      if (idToken) {
+        // Clean the URL
+        window.history.replaceState(null, '', window.location.pathname);
+        onGoogleLogin(idToken);
       }
-    }, 200);
-    // Give up after 10 seconds
-    const timeout = setTimeout(() => clearInterval(interval), 10000);
-    return () => { clearInterval(interval); clearTimeout(timeout); };
-  }, []);
-
-  // Render button once GSI is ready
-  useEffect(() => {
-    if (!gsiReady || !buttonRef.current || !GOOGLE_CLIENT_ID) return;
-
-    try {
-      window.google!.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: (response: { credential: string }) => {
-          callbackRef.current(response.credential);
-        },
-      });
-
-      window.google!.accounts.id.renderButton(buttonRef.current, {
-        theme: 'outline',
-        size: 'large',
-        width: 320,
-        text: 'signin_with',
-        shape: 'rectangular',
-      });
-    } catch (e) {
-      console.error('Google Sign-In init error:', e);
     }
-  }, [gsiReady]);
+  }, [onGoogleLogin]);
+
+  const handleGoogleSignIn = () => {
+    const redirectUri = `${window.location.origin}/admin`;
+    const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    authUrl.searchParams.set('client_id', GOOGLE_CLIENT_ID);
+    authUrl.searchParams.set('redirect_uri', redirectUri);
+    authUrl.searchParams.set('response_type', 'id_token');
+    authUrl.searchParams.set('scope', 'openid email');
+    authUrl.searchParams.set('nonce', crypto.randomUUID());
+    window.location.href = authUrl.toString();
+  };
 
   return (
     <div className="max-w-sm mx-auto surface-elevated p-8">
@@ -101,12 +60,18 @@ function GoogleLoginForm({ onGoogleLogin, loading, error }: {
           <p className="text-sm text-amber-700">Google Client ID not configured. Set VITE_GOOGLE_CLIENT_ID.</p>
         </div>
       ) : (
-        <div className="flex flex-col items-center gap-3">
-          <div ref={buttonRef} id="google-signin-btn" style={{ minHeight: 44, minWidth: 320 }} />
-          {!gsiReady && (
-            <p className="text-xs text-gray-400">Loading Google Sign-In...</p>
-          )}
-        </div>
+        <button
+          onClick={handleGoogleSignIn}
+          className="w-full flex items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
+        >
+          <svg className="h-5 w-5" viewBox="0 0 24 24">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Sign in with Google
+        </button>
       )}
     </div>
   );

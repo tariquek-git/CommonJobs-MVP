@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 
 export default function FounderSection() {
   const [collapsed, setCollapsed] = useLocalStorage('founder-collapsed', true);
+  const [detailsOpen, setDetailsOpen] = useLocalStorage('how-it-works-details', false);
   const contentRef = useRef<HTMLDivElement>(null);
   const { ref: stepsRef, inView: stepsVisible } = useInView();
 
@@ -132,6 +133,47 @@ export default function FounderSection() {
               </div>
               <p className="text-sm font-bold text-gray-900">Connect</p>
               <p className="text-xs text-gray-500 mt-0.5 hidden sm:block">Apply or warm intro</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Expandable detail section */}
+        <div className="border-t border-gray-100">
+          <button
+            onClick={() => setDetailsOpen(!detailsOpen)}
+            className="w-full flex items-center justify-between px-5 sm:px-8 py-3 text-left hover:bg-gray-50 transition-colors"
+            aria-expanded={detailsOpen}
+          >
+            <span className="text-xs font-semibold text-gray-500">How it actually works</span>
+            <svg
+              className={`h-3.5 w-3.5 text-gray-400 transition-transform duration-300 ${detailsOpen ? 'rotate-180' : ''}`}
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <div className={`overflow-hidden transition-all duration-300 ease-out ${detailsOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'}`}>
+            <div className="px-5 sm:px-8 pb-5 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="rounded-lg bg-indigo-50/50 border border-indigo-100 p-3">
+                  <p className="text-xs font-semibold text-indigo-700 mb-1">For posters</p>
+                  <p className="text-xs text-gray-600 leading-relaxed">
+                    Paste a job URL or description. AI rewrites the corporate speak into real talk — what someone in the role would actually care about. You review and edit before submitting.
+                  </p>
+                </div>
+                <div className="rounded-lg bg-emerald-50/50 border border-emerald-100 p-3">
+                  <p className="text-xs font-semibold text-emerald-700 mb-1">For candidates</p>
+                  <p className="text-xs text-gray-600 leading-relaxed">
+                    Browse real roles, humanized. Apply directly or request a warm intro — I'll pass your info to the poster. They decide if they want to connect. No pressure on either side.
+                  </p>
+                </div>
+              </div>
+              <div className="rounded-lg bg-gray-50 border border-gray-200/60 p-3">
+                <p className="text-xs font-semibold text-gray-700 mb-1">The warm intro promise</p>
+                <p className="text-xs text-gray-600 leading-relaxed">
+                  Candidates won't know if you respond or not. All I ask is that if you see potential, give them a real look. And if you can help regardless — even just a pointer or referral — please do. That's what makes this different from every other job board.
+                </p>
+              </div>
             </div>
           </div>
         </div>

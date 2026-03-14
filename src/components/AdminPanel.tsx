@@ -1,17 +1,72 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAdmin } from '../hooks/useAdmin';
 import { getAnalytics, getWarmIntros, updateWarmIntroStatus } from '../lib/api';
 import type { AnalyticsData, WarmIntroRecord } from '../lib/api';
 import type { Job } from '../lib/types';
 import { getRelativeTimeLabel } from '../lib/date';
 
-function LoginForm({ onLogin, loading, error }: {
-  onLogin: (u: string, p: string) => void;
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: {
+            client_id: string;
+            callback: (response: { credential: string }) => void;
+            auto_select?: boolean;
+          }) => void;
+          renderButton: (
+            element: HTMLElement,
+            config: { theme?: string; size?: string; width?: number; text?: string; shape?: string }
+          ) => void;
+        };
+      };
+    };
+  }
+}
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
+function GoogleLoginForm({ onGoogleLogin, loading, error }: {
+  onGoogleLogin: (credential: string) => void;
   loading: boolean;
   error: string | null;
 }) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const buttonRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const initGoogle = () => {
+      if (!window.google || !buttonRef.current || !GOOGLE_CLIENT_ID) return;
+
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: (response) => {
+          onGoogleLogin(response.credential);
+        },
+      });
+
+      window.google.accounts.id.renderButton(buttonRef.current, {
+        theme: 'outline',
+        size: 'large',
+        width: 320,
+        text: 'signin_with',
+        shape: 'rectangular',
+      });
+    };
+
+    // Google script might not be loaded yet
+    if (window.google) {
+      initGoogle();
+    } else {
+      const interval = setInterval(() => {
+        if (window.google) {
+          clearInterval(interval);
+          initGoogle();
+        }
+      }, 100);
+      return () => clearInterval(interval);
+    }
+  }, [onGoogleLogin]);
 
   return (
     <div className="max-w-sm mx-auto surface-elevated p-8">
@@ -22,25 +77,24 @@ function LoginForm({ onLogin, loading, error }: {
           </svg>
         </div>
         <h2 className="text-xl font-semibold text-gray-900">Admin Login</h2>
+        <p className="text-sm text-gray-500 mt-1">Sign in with your Google account</p>
       </div>
       {error && (
         <div className="rounded-lg bg-red-50 border border-red-200 p-3 mb-4">
           <p className="text-sm text-red-700">{error}</p>
         </div>
       )}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          onLogin(username, password);
-        }}
-        className="space-y-4"
-      >
-        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" className="input-field" autoComplete="username" />
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="input-field" autoComplete="current-password" />
-        <button type="submit" disabled={loading} className="btn-primary w-full">
-          {loading ? 'Logging in...' : 'Log In'}
-        </button>
-      </form>
+      {loading ? (
+        <div className="text-center text-gray-500 py-4">Signing in...</div>
+      ) : !GOOGLE_CLIENT_ID ? (
+        <div className="rounded-lg bg-amber-50 border border-amber-200 p-3">
+          <p className="text-sm text-amber-700">Google Client ID not configured. Set VITE_GOOGLE_CLIENT_ID.</p>
+        </div>
+      ) : (
+        <div className="flex justify-center">
+          <div ref={buttonRef} />
+        </div>
+      )}
     </div>
   );
 }
@@ -417,14 +471,14 @@ function WarmIntrosTab({ token }: { token: string }) {
 export default function AdminPanel() {
   const {
     token, jobs, runtime, loading, error,
-    statusFilter, login, logout,
+    statusFilter, loginWithGoogle, logout,
     setStatusFilter, changeJobStatus, refreshJobs,
   } = useAdmin();
   const [activeTab, setActiveTab] = useState<'jobs' | 'intros' | 'analytics'>('jobs');
   const [introsKey, setIntrosKey] = useState(0);
 
   if (!token) {
-    return <LoginForm onLogin={login} loading={loading} error={error} />;
+    return <GoogleLoginForm onGoogleLogin={loginWithGoogle} loading={loading} error={error} />;
   }
 
   return (

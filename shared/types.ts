@@ -90,8 +90,9 @@ export interface AIResult<T = string> {
 // ── Admin Types ──
 
 export interface AdminLoginPayload {
-  username: string;
-  password: string;
+  username?: string;
+  password?: string;
+  google_credential?: string;
 }
 
 export interface AdminLoginResponse {

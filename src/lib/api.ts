@@ -115,6 +115,13 @@ export async function adminLogin(payload: AdminLoginPayload): Promise<AdminLogin
   });
 }
 
+export async function adminGoogleLogin(credential: string): Promise<AdminLoginResponse> {
+  return request('/auth/admin-login', {
+    method: 'POST',
+    body: JSON.stringify({ google_credential: credential }),
+  });
+}
+
 export async function getRuntime(token: string): Promise<RuntimeInfo> {
   return request('/admin/runtime', {
     headers: authHeaders(token),

@@ -33,40 +33,50 @@ function GoogleLoginForm({ onGoogleLogin, loading, error }: {
   error: string | null;
 }) {
   const buttonRef = useRef<HTMLDivElement>(null);
+  const callbackRef = useRef(onGoogleLogin);
+  callbackRef.current = onGoogleLogin;
+  const [gsiReady, setGsiReady] = useState(false);
 
+  // Wait for Google script to load
   useEffect(() => {
-    const initGoogle = () => {
-      if (!window.google || !buttonRef.current || !GOOGLE_CLIENT_ID) return;
+    if (window.google?.accounts?.id) {
+      setGsiReady(true);
+      return;
+    }
+    const interval = setInterval(() => {
+      if (window.google?.accounts?.id) {
+        setGsiReady(true);
+        clearInterval(interval);
+      }
+    }, 200);
+    // Give up after 10 seconds
+    const timeout = setTimeout(() => clearInterval(interval), 10000);
+    return () => { clearInterval(interval); clearTimeout(timeout); };
+  }, []);
 
-      window.google.accounts.id.initialize({
+  // Render button once GSI is ready
+  useEffect(() => {
+    if (!gsiReady || !buttonRef.current || !GOOGLE_CLIENT_ID) return;
+
+    try {
+      window.google!.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
-        callback: (response) => {
-          onGoogleLogin(response.credential);
+        callback: (response: { credential: string }) => {
+          callbackRef.current(response.credential);
         },
       });
 
-      window.google.accounts.id.renderButton(buttonRef.current, {
+      window.google!.accounts.id.renderButton(buttonRef.current, {
         theme: 'outline',
         size: 'large',
         width: 320,
         text: 'signin_with',
         shape: 'rectangular',
       });
-    };
-
-    // Google script might not be loaded yet
-    if (window.google) {
-      initGoogle();
-    } else {
-      const interval = setInterval(() => {
-        if (window.google) {
-          clearInterval(interval);
-          initGoogle();
-        }
-      }, 100);
-      return () => clearInterval(interval);
+    } catch (e) {
+      console.error('Google Sign-In init error:', e);
     }
-  }, [onGoogleLogin]);
+  }, [gsiReady]);
 
   return (
     <div className="max-w-sm mx-auto surface-elevated p-8">
@@ -91,8 +101,11 @@ function GoogleLoginForm({ onGoogleLogin, loading, error }: {
           <p className="text-sm text-amber-700">Google Client ID not configured. Set VITE_GOOGLE_CLIENT_ID.</p>
         </div>
       ) : (
-        <div className="flex justify-center">
-          <div ref={buttonRef} />
+        <div className="flex flex-col items-center gap-3">
+          <div ref={buttonRef} id="google-signin-btn" style={{ minHeight: 44, minWidth: 320 }} />
+          {!gsiReady && (
+            <p className="text-xs text-gray-400">Loading Google Sign-In...</p>
+          )}
         </div>
       )}
     </div>

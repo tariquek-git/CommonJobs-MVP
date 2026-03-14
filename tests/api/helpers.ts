@@ -50,7 +50,11 @@ export function mockSupabase(overrides: {
 } = {}) {
   const chain: Record<string, unknown> = {
     insert: vi.fn().mockReturnValue({
-      select: vi.fn().mockResolvedValue(overrides.insertResult || { error: null }),
+      select: vi.fn().mockReturnValue({
+        single: vi.fn().mockResolvedValue(
+          overrides.insertResult || { data: { id: 'mock-id' }, error: null }
+        ),
+      }),
       ...(overrides.insertResult || { error: null }),
     }),
     select: vi.fn().mockReturnValue({

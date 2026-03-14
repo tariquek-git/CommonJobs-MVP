@@ -35,9 +35,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const ip = getClientIP(req as unknown as Request);
     const ipHash = createHash('sha256').update(ip).digest('hex');
 
+    const userAgent = (req.headers['user-agent'] as string) || null;
+    const referrer = (req.headers['referer'] as string) || null;
+
     const { error: clickError } = await supabase.from(getClicksTable()).insert({
       job_id: id,
       ip_hash: ipHash,
+      user_agent: userAgent,
+      referrer,
     });
 
     if (clickError) {

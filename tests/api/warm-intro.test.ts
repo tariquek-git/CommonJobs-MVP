@@ -2,7 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mockReq, mockRes } from './helpers';
 
 // Mock supabase
-const mockInsert = vi.fn().mockResolvedValue({ error: null });
+const mockIntroSingle = vi.fn().mockResolvedValue({ data: { id: 'mock-intro-id' }, error: null });
+const mockIntroSelect = vi.fn().mockReturnValue({ single: mockIntroSingle });
+const mockInsert = vi.fn().mockReturnValue({ select: mockIntroSelect });
+const mockEmailInsert = vi.fn().mockResolvedValue({ error: null });
 const mockSelectSingle = vi.fn().mockResolvedValue({
   data: { title: 'Engineer', company: 'Acme' },
   error: null,
@@ -10,6 +13,9 @@ const mockSelectSingle = vi.fn().mockResolvedValue({
 const mockFrom = vi.fn().mockImplementation((table: string) => {
   if (table === 'warm_intros') {
     return { insert: mockInsert };
+  }
+  if (table === 'email_logs') {
+    return { insert: mockEmailInsert };
   }
   return {
     select: vi.fn().mockReturnValue({
@@ -57,7 +63,9 @@ import { rateLimitOrReject } from '../../lib/rate-limit.js';
 describe('POST /api/jobs/warm-intro', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockInsert.mockResolvedValue({ error: null });
+    mockIntroSingle.mockResolvedValue({ data: { id: 'mock-intro-id' }, error: null });
+    mockIntroSelect.mockReturnValue({ single: mockIntroSingle });
+    mockInsert.mockReturnValue({ select: mockIntroSelect });
   });
 
   it('rejects non-POST methods', async () => {
@@ -114,7 +122,9 @@ describe('POST /api/jobs/warm-intro', () => {
   });
 
   it('returns 500 on database insert failure', async () => {
-    mockInsert.mockResolvedValue({ error: { message: 'DB error' } });
+    mockIntroSingle.mockResolvedValue({ data: null, error: { message: 'DB error' } });
+    mockIntroSelect.mockReturnValue({ single: mockIntroSingle });
+    mockInsert.mockReturnValue({ select: mockIntroSelect });
     const req = mockReq({
       body: {
         job_id: '123',

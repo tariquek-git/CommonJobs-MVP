@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 import { getEnv } from './env.js';
 import { logger } from './logger.js';
+import { getSupabase } from './supabase.js';
 import type { Job } from '../shared/types.js';
 
 let resendClient: Resend | null = null;
@@ -30,12 +31,13 @@ export async function sendApprovalEmail(to: string, job: Job): Promise<boolean> 
   const jobUrl = `https://commonsjobs.com/job/${job.id}`;
   const safeTitle = escHtml(job.title);
   const safeCompany = escHtml(job.company);
+  const subject = `Your job posting "${job.title}" is now live!`;
 
   try {
-    await resend.emails.send({
+    const result = await resend.emails.send({
       from: 'Fintech Commons <notifications@commonsjobs.com>',
       to,
-      subject: `Your job posting "${job.title}" is now live!`,
+      subject,
       html: `
         <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
           <h2 style="color: #0A1628; margin-bottom: 8px;">Your job is live on Fintech Commons</h2>
@@ -55,9 +57,42 @@ export async function sendApprovalEmail(to: string, job: Job): Promise<boolean> 
       `,
       text: `Your job posting "${job.title}" at ${job.company} is now live on Fintech Commons!\n\nView it here: ${jobUrl}\n\n— Tarique, Fintech Commons`,
     });
+
+    // Log email to DB
+    logEmail('approval_notification', to, subject, job.id, 'sent', { resend_id: result?.data?.id });
+
     return true;
   } catch (err) {
     logger.error('Email send error', { endpoint: 'email', to, error: err });
+    logEmail('approval_notification', to, subject, job.id, 'failed', undefined, err instanceof Error ? err.message : 'Unknown error');
     return false;
   }
+}
+
+function logEmail(
+  eventType: string,
+  recipient: string,
+  subject: string,
+  jobId?: string,
+  status: string = 'sent',
+  metadata?: Record<string, unknown>,
+  errorMessage?: string,
+) {
+  // Fire-and-forget — don't crash if supabase isn't ready
+  (async () => {
+    try {
+      const supabase = getSupabase();
+      await supabase.from('email_logs').insert({
+        event_type: eventType,
+        recipient,
+        subject,
+        related_job_id: jobId || null,
+        status,
+        metadata: metadata || {},
+        error_message: errorMessage || null,
+      });
+    } catch {
+      // Non-critical
+    }
+  })();
 }

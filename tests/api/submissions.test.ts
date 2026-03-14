@@ -2,7 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mockReq, mockRes } from './helpers';
 
 // Mock supabase
-const mockInsert = vi.fn().mockResolvedValue({ error: null });
+const mockSingle = vi.fn().mockResolvedValue({ data: { id: 'mock-job-id' }, error: null });
+const mockSelect = vi.fn().mockReturnValue({ single: mockSingle });
+const mockInsert = vi.fn().mockReturnValue({ select: mockSelect });
 const mockFrom = vi.fn().mockReturnValue({ insert: mockInsert });
 
 vi.mock('../../lib/supabase.js', () => ({
@@ -33,7 +35,9 @@ import { rateLimitOrReject } from '../../lib/rate-limit.js';
 describe('POST /api/jobs/submissions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockInsert.mockResolvedValue({ error: null });
+    mockSingle.mockResolvedValue({ data: { id: 'mock-job-id' }, error: null });
+    mockSelect.mockReturnValue({ single: mockSingle });
+    mockInsert.mockReturnValue({ select: mockSelect });
   });
 
   it('rejects non-POST methods', async () => {
@@ -84,7 +88,9 @@ describe('POST /api/jobs/submissions', () => {
   });
 
   it('returns 500 on database error', async () => {
-    mockInsert.mockResolvedValue({ error: { message: 'DB error' } });
+    mockSingle.mockResolvedValue({ data: null, error: { message: 'DB error' } });
+    mockSelect.mockReturnValue({ single: mockSingle });
+    mockInsert.mockReturnValue({ select: mockSelect });
     const req = mockReq({
       body: {
         title: 'Software Engineer',

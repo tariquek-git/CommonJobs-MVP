@@ -3,6 +3,7 @@ import { getSupabase, getJobsTable } from '../../lib/supabase.js';
 import { validateSubmission, sanitizeSubmission } from '../../shared/validation.js';
 import type { SubmissionPayload, SubmissionResponse } from '../../shared/types.js';
 import { getClientIP, rateLimitOrReject, RATE_LIMITS } from '../../lib/rate-limit.js';
+import { createHash } from 'crypto';
 
 function generateRefId(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -58,8 +59,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
+    // Capture analytics metadata
+    const ipHash = createHash('sha256').update(ip).digest('hex');
+    const userAgent = (req.headers['user-agent'] as string) || null;
+    const referrer = (req.headers['referer'] as string) || null;
+
     const supabase = getSupabase();
-    const { error } = await supabase.from(getJobsTable()).insert({
+    const { data: inserted, error } = await supabase.from(getJobsTable()).insert({
       title: payload.title,
       company: payload.company,
       location: payload.location || null,
@@ -79,13 +85,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       submitter_email: payload.submitter_email || null,
       tags: payload.tags || [],
       standout_perks: payload.standout_perks || [],
-    });
+      warm_intro_ok: payload.warm_intro_ok ?? true,
+      submitter_ip_hash: ipHash,
+      submitter_user_agent: userAgent,
+      submitter_referrer: referrer,
+    }).select('id').single();
 
     if (error) {
       const { logger } = await import('../../lib/logger.js');
       logger.error('Submission insert error', { endpoint: 'submissions', error });
       return res.status(500).json({ error: 'Failed to save submission', code: 'STORAGE_ERROR' });
     }
+
+    // Send notification email to admin (non-blocking)
+    notifyAdmin(payload, submissionRef, inserted?.id).catch(() => {});
 
     return res.status(201).json({
       success: true,
@@ -96,5 +109,66 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { logger } = await import('../../lib/logger.js');
     logger.error('Submission handler error', { endpoint: 'submissions', error: err });
     return res.status(500).json({ error: 'Internal server error', code: 'INTERNAL_ERROR' });
+  }
+}
+
+async function notifyAdmin(payload: SubmissionPayload, ref: string, jobId?: string) {
+  try {
+    const { Resend } = await import('resend');
+    const key = process.env.RESEND_API_KEY;
+    const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || 'tariquek@gmail.com';
+    if (!key) return;
+
+    const resend = new Resend(key);
+    const subject = `New Submission: ${payload.title} at ${payload.company} [${ref}]`;
+
+    const result = await resend.emails.send({
+      from: 'Fintech Commons <notifications@commonsjobs.com>',
+      to: adminEmail,
+      subject,
+      html: `
+        <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
+          <h2 style="color: #0A1628; margin-bottom: 8px;">New Job Submission</h2>
+          <p style="color: #64748B; font-size: 15px;"><strong>Ref:</strong> ${ref}</p>
+          <p style="color: #64748B; font-size: 15px;"><strong>Title:</strong> ${payload.title}</p>
+          <p style="color: #64748B; font-size: 15px;"><strong>Company:</strong> ${payload.company}</p>
+          ${payload.location ? `<p style="color: #64748B; font-size: 15px;"><strong>Location:</strong> ${payload.location}</p>` : ''}
+          ${payload.submitter_name ? `<p style="color: #64748B; font-size: 15px;"><strong>Submitted by:</strong> ${payload.submitter_name} (${payload.submitter_email || 'no email'})</p>` : ''}
+          ${payload.warm_intro_ok ? '<p style="color: #059669; font-size: 15px;">✅ Warm intros enabled</p>' : '<p style="color: #9CA3AF; font-size: 15px;">❌ Warm intros disabled</p>'}
+          <hr style="border: none; border-top: 1px solid #E2E8F0; margin: 16px 0;" />
+          <p style="color: #94A3B8; font-size: 13px;">Review in admin panel → /admin</p>
+        </div>
+      `,
+      text: `New Job Submission\n\nRef: ${ref}\nTitle: ${payload.title}\nCompany: ${payload.company}\nLocation: ${payload.location || 'N/A'}\nSubmitter: ${payload.submitter_name || 'N/A'} (${payload.submitter_email || 'N/A'})\nWarm intros: ${payload.warm_intro_ok ? 'Yes' : 'No'}\n\nReview in admin panel.`,
+    });
+
+    // Log email to DB
+    const supabase = getSupabase();
+    try {
+      await supabase.from('email_logs').insert({
+        event_type: 'submission_notification',
+        recipient: adminEmail,
+        subject,
+        related_job_id: jobId || null,
+        status: 'sent',
+        metadata: { resend_id: result?.data?.id },
+      });
+    } catch { /* non-critical */ }
+  } catch (err) {
+    const { logger } = await import('../../lib/logger.js');
+    logger.warn('Submission notification email failed', { endpoint: 'submissions', error: err });
+
+    // Log failed email
+    try {
+      const supabase = getSupabase();
+      const sb = getSupabase();
+      await sb.from('email_logs').insert({
+        event_type: 'submission_notification',
+        recipient: process.env.ADMIN_NOTIFICATION_EMAIL || 'tariquek@gmail.com',
+        subject: `New Submission: ${payload.title} at ${payload.company}`,
+        status: 'failed',
+        error_message: err instanceof Error ? err.message : 'Unknown error',
+      });
+    } catch { /* ignore */ }
   }
 }

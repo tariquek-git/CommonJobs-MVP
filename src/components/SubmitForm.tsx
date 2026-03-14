@@ -1,51 +1,14 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { submitJob, scrapeUrl, humanizeJob } from '../lib/api';
 import type { SubmissionPayload } from '../lib/types';
 import { useToast } from './Toast';
 import { usePostHog } from '@posthog/react';
 
-const STEPS = [
-  { label: 'Details', icon: '1' },
-  { label: 'Humanize & Submit', icon: '2' },
-];
-
-function StepIndicator({ current, total }: { current: number; total: number }) {
-  return (
-    <div className="flex items-center gap-2 mb-8" role="progressbar" aria-valuenow={current + 1} aria-valuemin={1} aria-valuemax={total} aria-label={`Step ${current + 1} of ${total}`}>
-      {Array.from({ length: total }).map((_, i) => (
-        <div key={i} className="flex items-center gap-2 flex-1">
-          <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all ${
-            i < current
-              ? 'bg-indigo-600 text-white'
-              : i === current
-              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/25'
-              : 'bg-gray-200 text-gray-400'
-          }`}>
-            {i < current ? (
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-              </svg>
-            ) : (
-              STEPS[i].icon
-            )}
-          </div>
-          {i < total - 1 && (
-            <div className="flex-1 h-1 rounded-full overflow-hidden bg-gray-200">
-              <div className={`h-full rounded-full transition-all duration-500 ${
-                i < current ? 'w-full bg-indigo-600' : 'w-0'
-              }`} />
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export default function SubmitForm() {
   const { toast } = useToast();
   const posthog = usePostHog();
-  const [step, setStep] = useState(0);
+  const formSectionRef = useRef<HTMLDivElement>(null);
+
   const [form, setForm] = useState<SubmissionPayload>({
     title: '',
     company: '',
@@ -70,7 +33,7 @@ export default function SubmitForm() {
   const [scrapeFailed, setScrapeFailed] = useState(false);
   const [website, setWebsite] = useState('');
 
-  const updateField = (field: keyof SubmissionPayload, value: string | string[]) => {
+  const updateField = (field: keyof SubmissionPayload, value: string | string[] | boolean) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -131,7 +94,6 @@ export default function SubmitForm() {
     }
   };
 
-
   const handleAddPerk = () => {
     const perk = perkInput.trim();
     if (perk && (!form.standout_perks || form.standout_perks.length < 10) && !form.standout_perks?.includes(perk)) {
@@ -168,11 +130,7 @@ export default function SubmitForm() {
     }
   };
 
-  const canProceed = (s: number) => {
-    if (s === 0) return !!(form.title.trim() && form.company.trim());
-    return true;
-  };
-
+  // ── Success Screen ──
   if (result) {
     return (
       <div className="surface-elevated p-8 text-center max-w-lg mx-auto animate-scale-in">
@@ -191,7 +149,6 @@ export default function SubmitForm() {
         <button
           onClick={() => {
             setResult(null);
-            setStep(0);
             setForm({
               title: '', company: '', location: '', country: '',
               description: '', summary: '', apply_url: '', company_url: '',
@@ -208,359 +165,392 @@ export default function SubmitForm() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <StepIndicator current={step} total={STEPS.length} />
+    <div className="max-w-2xl mx-auto space-y-10">
+
+      {/* ━━━ Section 1: How It Works ━━━ */}
+      <section className="surface-elevated p-6 sm:p-8">
+        <h2 className="text-lg font-semibold text-gray-900 mb-1">How Fintech Commons works</h2>
+        <p className="text-sm text-gray-600 mb-6">
+          This isn't a job board where listings disappear into the void. Here's what makes it different.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          {/* Step 1 */}
+          <div className="text-center sm:text-left">
+            <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 mb-3">
+              <svg className="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+              </svg>
+            </div>
+            <h3 className="text-sm font-semibold text-gray-900 mb-1">You submit</h3>
+            <p className="text-xs text-gray-600 leading-relaxed">
+              Paste the job URL and description. AI translates the corporate-speak into real talk.
+            </p>
+          </div>
+
+          {/* Step 2 */}
+          <div className="text-center sm:text-left">
+            <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 mb-3">
+              <svg className="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-sm font-semibold text-gray-900 mb-1">I review it</h3>
+            <p className="text-xs text-gray-600 leading-relaxed">
+              Every submission is personally reviewed. No spam, no ghost listings. If it's on the board, it's real.
+            </p>
+          </div>
+
+          {/* Step 3 */}
+          <div className="text-center sm:text-left">
+            <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 mb-3">
+              <svg className="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+              </svg>
+            </div>
+            <h3 className="text-sm font-semibold text-gray-900 mb-1">Candidates connect</h3>
+            <p className="text-xs text-gray-600 leading-relaxed">
+              People can request a warm intro through you. You decide if you want to help — zero pressure.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ━━━ Section 2: Warm Intro Disclaimer ━━━ */}
+      <section className="rounded-xl bg-indigo-50/50 border border-indigo-200/40 p-5 sm:p-6">
+        <div className="flex gap-3">
+          <div className="shrink-0 mt-0.5">
+            <svg className="h-5 w-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-indigo-800 mb-1">About warm intros</h3>
+            <p className="text-sm text-gray-700 leading-relaxed">
+              When someone sees a role you've posted, they can request a warm intro through me. I'll share their info with you — name, LinkedIn, and a short message about why they're interested.
+            </p>
+            <p className="text-sm text-gray-700 leading-relaxed mt-2">
+              <span className="font-medium">The candidate doesn't know if you respond or not.</span> There's no pressure — if the fit isn't right, no worries. All I ask is that if you see potential, give them a real look. And if you think you can help regardless — even just a pointer or referral — please do.
+            </p>
+          </div>
+        </div>
+      </section>
 
       {aiFallback && (
-        <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 mb-6" role="alert">
+        <div className="rounded-xl bg-amber-50 border border-amber-200 p-3" role="alert">
           <p className="text-xs text-amber-700">
             AI features are temporarily unavailable. You can still edit and submit manually.
           </p>
         </div>
       )}
 
-      <div className="animate-fade-in">
-        {/* Step 0: Job Details + Description */}
-        {step === 0 && (
-          <div className="space-y-5">
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">Job Details</h3>
+      {/* ━━━ Section 3: Job URL & Raw Description ━━━ */}
+      <section className="surface-elevated p-6 sm:p-8 space-y-5">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">Paste the job</h2>
+          <p className="text-sm text-gray-600">
+            Drop the job URL and/or copy-paste the full description. Add anything else you think candidates should know — context only the poster or someone close to the role would have.
+          </p>
+        </div>
 
-            {/* Scout's honor callout */}
-            <div className="rounded-xl bg-indigo-50/50 border border-indigo-200/40 p-4">
-              <div className="flex gap-3">
-                <div className="shrink-0 mt-0.5">
-                  <svg className="h-5 w-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-indigo-700 mb-0.5">Scout's honor</p>
-                  <p className="text-xs text-gray-600 leading-relaxed">
-                    Every role posted here is personally reviewed before it goes live.
-                    No spam, no ghost listings.
-                    If it's on the board, it's real.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* URL Auto-fill */}
-            <div>
-              <label htmlFor="submit-apply-url" className="block text-sm font-medium text-gray-700 mb-1.5">Job URL (optional)</label>
-              <div className="flex gap-2">
-                <input
-                  id="submit-apply-url"
-                  type="url"
-                  value={form.apply_url}
-                  onChange={(e) => updateField('apply_url', e.target.value)}
-                  placeholder="https://company.com/careers/role"
-                  className="input-field flex-1"
-                />
-                <button
-                  type="button"
-                  onClick={handleScrapeUrl}
-                  disabled={!form.apply_url || scraping}
-                  className="btn-secondary shrink-0 disabled:opacity-40"
-                  aria-busy={scraping}
-                >
-                  {scraping ? (
-                    <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                    </svg>
-                  ) : 'Auto-fill'}
-                </button>
-              </div>
-              {scrapeFailed && (
-                <p className="text-xs text-amber-600 mt-1" role="alert">Could not scrape — fill in manually below.</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="submit-title" className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Job Title <span className="text-red-500" aria-hidden="true">*</span>
-                  <span className="sr-only">(required)</span>
-                </label>
-                <input id="submit-title" type="text" value={form.title} onChange={(e) => updateField('title', e.target.value)} className="input-field" placeholder="Senior Software Engineer" required aria-required="true" />
-              </div>
-              <div>
-                <label htmlFor="submit-company" className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Company <span className="text-red-500" aria-hidden="true">*</span>
-                  <span className="sr-only">(required)</span>
-                </label>
-                <input id="submit-company" type="text" value={form.company} onChange={(e) => updateField('company', e.target.value)} className="input-field" placeholder="Acme Corp" required aria-required="true" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="submit-location" className="block text-sm font-medium text-gray-700 mb-1.5">Location</label>
-                <input id="submit-location" type="text" value={form.location} onChange={(e) => updateField('location', e.target.value)} className="input-field" placeholder="Toronto, ON" />
-              </div>
-              <div>
-                <label htmlFor="submit-country" className="block text-sm font-medium text-gray-700 mb-1.5">Country</label>
-                <input id="submit-country" type="text" value={form.country} onChange={(e) => updateField('country', e.target.value)} className="input-field" placeholder="Canada" />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="submit-company-url" className="block text-sm font-medium text-gray-700 mb-1.5">Company Website</label>
-              <input id="submit-company-url" type="url" value={form.company_url} onChange={(e) => updateField('company_url', e.target.value)} className="input-field" placeholder="https://company.com" />
-            </div>
-
-            <div>
-              <label htmlFor="submit-description" className="block text-sm font-medium text-gray-700 mb-1.5">Job Description</label>
-              <textarea
-                id="submit-description"
-                value={form.description}
-                onChange={(e) => updateField('description', e.target.value)}
-                rows={8}
-                className="input-field resize-y"
-                placeholder="Paste the original job description here (corporate-speak welcome — I'll humanize it next)..."
-              />
-            </div>
-
-          </div>
-        )}
-
-        {/* Step 1: Humanize + Review + Submit */}
-        {step === 1 && (
-          <div className="space-y-5">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Humanize & Review</h3>
-              <button
-                type="button"
-                onClick={handleHumanize}
-                disabled={!form.description || !form.title || humanizing}
-                className="btn-primary text-xs disabled:opacity-40"
-                aria-busy={humanizing}
-              >
-                {humanizing ? (
-                  <>
-                    <svg className="animate-spin h-3.5 w-3.5 mr-1.5" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                    </svg>
-                    Humanizing...
-                  </>
-                ) : (
-                  <>
-                    <svg className="h-3.5 w-3.5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-                    </svg>
-                    Humanize with AI
-                  </>
-                )}
-              </button>
-            </div>
-
-            <p className="text-xs text-gray-600 -mt-3">
-              AI rewrites the corporate description into plain language tailored to the role and highlights standout perks.
-            </p>
-
-            {/* Humanized summary */}
-            <div>
-              <label htmlFor="submit-summary" className="block text-sm font-medium text-gray-700 mb-1.5">Humanized Description</label>
-              <textarea
-                id="submit-summary"
-                value={form.summary}
-                onChange={(e) => updateField('summary', e.target.value)}
-                rows={5}
-                className="input-field resize-y"
-                placeholder="Click 'Humanize with AI' above, or write your own plain-language description..."
-              />
-            </div>
-
-            {/* Standout perks */}
-            <div>
-              <label htmlFor="submit-perk-input" className="block text-sm font-medium text-gray-700 mb-1.5">
-                Standout Perks
-                <span className="text-xs text-gray-600 ml-2 font-normal">Beyond the usual 401k, dental, vision</span>
-              </label>
-              {form.standout_perks && form.standout_perks.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {form.standout_perks.map((perk) => (
-                    <span key={perk} className="inline-flex items-center gap-1 rounded-full bg-indigo-50 border border-indigo-200 px-2.5 py-1 text-xs text-indigo-700">
-                      <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
-                      </svg>
-                      {perk}
-                      <button type="button" onClick={() => handleRemovePerk(perk)} className="text-indigo-400 hover:text-red-500 ml-0.5" aria-label={`Remove ${perk}`}>&times;</button>
-                    </span>
-                  ))}
-                </div>
-              )}
-              <div className="flex gap-2">
-                <input
-                  id="submit-perk-input"
-                  type="text"
-                  value={perkInput}
-                  onChange={(e) => setPerkInput(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddPerk(); } }}
-                  className="input-field flex-1"
-                  placeholder="e.g., 4-day work week, equity, remote-first"
-                />
-                <button type="button" onClick={handleAddPerk} className="btn-secondary shrink-0">Add</button>
-              </div>
-            </div>
-
-            {/* Preview card */}
-            <div>
-              <p className="text-xs font-medium text-gray-600 uppercase tracking-wider mb-2">Preview</p>
-              <div className="surface-elevated p-5 relative overflow-hidden">
-                <h4 className="font-semibold text-gray-900">{form.title || 'Untitled'}</h4>
-                <p className="text-sm text-gray-600 mt-0.5">{form.company || 'No company'}</p>
-                {form.location && <p className="text-xs text-gray-600 mt-1">{form.location}{form.country ? `, ${form.country}` : ''}</p>}
-                {form.summary && <p className="text-sm text-gray-600 leading-relaxed mt-2 line-clamp-3">{form.summary}</p>}
-                {form.standout_perks && form.standout_perks.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mt-2">
-                    {form.standout_perks.slice(0, 3).map((perk) => (
-                      <span key={perk} className="inline-flex items-center gap-1 rounded-full bg-indigo-50 border border-indigo-200 px-2 py-0.5 text-xs text-indigo-700">
-                        <svg className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
-                        </svg>
-                        {perk}
-                      </span>
-                    ))}
-                    {form.standout_perks.length > 3 && (
-                      <span className="text-xs text-gray-600">+{form.standout_perks.length - 3} more</span>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Warm intro opt-in */}
-            <div className="rounded-xl bg-indigo-50/50 border border-indigo-200/40 p-4">
-              <div className="flex items-start gap-3">
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={form.warm_intro_ok}
-                  aria-label="Allow warm intros for this role"
-                  onClick={() => setForm((prev) => ({ ...prev, warm_intro_ok: !prev.warm_intro_ok }))}
-                  className={`shrink-0 mt-0.5 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:ring-offset-2 ${
-                    form.warm_intro_ok ? 'bg-indigo-600' : 'bg-gray-300'
-                  }`}
-                >
-                  <span className={`inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${
-                    form.warm_intro_ok ? 'translate-x-6' : 'translate-x-1'
-                  }`} />
-                </button>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Allow warm intros for this role</p>
-                  <p className="text-xs text-gray-600 leading-relaxed mt-0.5">
-                    Candidates can request a warm intro through me. When they do, I'll send you an email with their info so you can connect directly.
-                  </p>
-                  {form.warm_intro_ok && (
-                    <div className="mt-3 rounded-xl bg-white/60 border border-indigo-200/40 p-3">
-                      <div className="flex gap-2">
-                        <svg className="h-4 w-4 text-indigo-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <p className="text-xs text-indigo-700 leading-relaxed">
-                          <span className="font-semibold">The deal:</span> By opting in, you're committing to look when a candidate reaches out. You don't have to hire them — just engage in good faith. That's what makes this work.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Submitter contact */}
-            <div className="rounded-xl bg-gray-50 border border-gray-200/60 p-4 space-y-3">
-              <div className="flex items-center gap-2 mb-1">
-                <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+        {/* URL + auto-fill */}
+        <div>
+          <label htmlFor="submit-apply-url" className="block text-sm font-medium text-gray-700 mb-1.5">Job URL</label>
+          <div className="flex gap-2">
+            <input
+              id="submit-apply-url"
+              type="url"
+              value={form.apply_url}
+              onChange={(e) => updateField('apply_url', e.target.value)}
+              placeholder="https://company.com/careers/role"
+              className="input-field flex-1"
+            />
+            <button
+              type="button"
+              onClick={handleScrapeUrl}
+              disabled={!form.apply_url || scraping}
+              className="btn-secondary shrink-0 disabled:opacity-40"
+              aria-busy={scraping}
+            >
+              {scraping ? (
+                <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                <p className="text-sm font-medium text-gray-700">A bit about you</p>
-              </div>
-              <p className="text-xs text-gray-600 leading-relaxed -mt-1">
-                So I can let you know when it's live and connect candidates who want a warm intro. Never shared publicly.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label htmlFor="submit-your-name" className="block text-xs font-medium text-gray-600 mb-1">Your Name</label>
-                  <input id="submit-your-name" type="text" value={form.submitter_name || ''} onChange={(e) => updateField('submitter_name', e.target.value)} className="input-field" placeholder="Jane Doe" />
-                </div>
-                <div>
-                  <label htmlFor="submit-your-email" className="block text-xs font-medium text-gray-600 mb-1">Your Email</label>
-                  <input id="submit-your-email" type="email" value={form.submitter_email} onChange={(e) => updateField('submitter_email', e.target.value)} className="input-field" placeholder="you@email.com" />
-                </div>
-              </div>
-            </div>
-
-            {/* Honeypot */}
-            <div className="absolute -left-[9999px]" aria-hidden="true">
-              <label htmlFor="website">Website</label>
-              <input id="website" type="text" value={website} onChange={(e) => setWebsite(e.target.value)} tabIndex={-1} autoComplete="off" />
-            </div>
+              ) : 'Auto-fill'}
+            </button>
           </div>
-        )}
-      </div>
+          {scrapeFailed && (
+            <p className="text-xs text-amber-600 mt-1" role="alert">Could not scrape — fill in manually below.</p>
+          )}
+        </div>
 
-      {/* Navigation */}
-      <div className="flex items-center justify-between mt-8">
-        <button
-          type="button"
-          onClick={() => setStep((s) => Math.max(0, s - 1))}
-          disabled={step === 0}
-          className="btn-secondary disabled:opacity-30"
-        >
-          <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-          </svg>
-          Back
-        </button>
+        {/* Full job description */}
+        <div>
+          <label htmlFor="submit-description" className="block text-sm font-medium text-gray-700 mb-1.5">Full Job Description</label>
+          <textarea
+            id="submit-description"
+            value={form.description}
+            onChange={(e) => updateField('description', e.target.value)}
+            rows={10}
+            className="input-field resize-y"
+            placeholder="Paste the full job description here — corporate speak is welcome, that's what the AI is for..."
+          />
+        </div>
+      </section>
 
-        {step < STEPS.length - 1 ? (
+      {/* ━━━ Section 4: Humanize with AI ━━━ */}
+      <section className="surface-elevated p-6 sm:p-8 space-y-5" ref={formSectionRef}>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-1">Humanize with AI</h2>
+            <p className="text-sm text-gray-600">
+              Translates corporate jargon into plain language. Auto-fills the fields below.
+            </p>
+          </div>
           <button
             type="button"
-            onClick={() => {
-              posthog?.capture('job_submission_step_completed', {
-                step: step + 1,
-                step_name: STEPS[step].label,
-                job_title: form.title,
-                company: form.company,
-              });
-              setStep((s) => s + 1);
-            }}
-            disabled={!canProceed(step)}
-            className="btn-primary disabled:opacity-40"
+            onClick={handleHumanize}
+            disabled={!form.description || !form.title || humanizing}
+            className="btn-primary shrink-0 disabled:opacity-40"
+            aria-busy={humanizing}
           >
-            Next
-            <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={submitting || !form.title || !form.company}
-            className="btn-primary disabled:opacity-40"
-            aria-busy={submitting}
-          >
-            {submitting ? (
+            {humanizing ? (
               <>
                 <svg className="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                Submitting...
+                Humanizing...
               </>
             ) : (
               <>
-                Submit for Review
-                <svg className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                <svg className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
                 </svg>
+                Humanize with AI
               </>
             )}
           </button>
+        </div>
+
+        <div className="rounded-lg bg-gray-50 border border-gray-200/60 px-3 py-2">
+          <p className="text-xs text-gray-500">
+            Powered by <span className="font-medium text-gray-600">Claude</span> (Anthropic). AI is human too and makes mistakes — please review and edit the generated content below before submitting.
+          </p>
+        </div>
+      </section>
+
+      {/* ━━━ Section 5: Auto-filled Job Details ━━━ */}
+      <section className="surface-elevated p-6 sm:p-8 space-y-5">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">Job details</h2>
+          <p className="text-sm text-gray-600">
+            These fields are auto-filled from the URL and AI. Review and correct anything that's off.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="submit-title" className="block text-sm font-medium text-gray-700 mb-1.5">
+              Job Title <span className="text-red-500" aria-hidden="true">*</span>
+              <span className="sr-only">(required)</span>
+            </label>
+            <input id="submit-title" type="text" value={form.title} onChange={(e) => updateField('title', e.target.value)} className="input-field" placeholder="Senior Software Engineer" required aria-required="true" />
+          </div>
+          <div>
+            <label htmlFor="submit-company" className="block text-sm font-medium text-gray-700 mb-1.5">
+              Company <span className="text-red-500" aria-hidden="true">*</span>
+              <span className="sr-only">(required)</span>
+            </label>
+            <input id="submit-company" type="text" value={form.company} onChange={(e) => updateField('company', e.target.value)} className="input-field" placeholder="Stripe" required aria-required="true" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="submit-location" className="block text-sm font-medium text-gray-700 mb-1.5">Location</label>
+            <input id="submit-location" type="text" value={form.location} onChange={(e) => updateField('location', e.target.value)} className="input-field" placeholder="Toronto, ON" />
+          </div>
+          <div>
+            <label htmlFor="submit-country" className="block text-sm font-medium text-gray-700 mb-1.5">Country</label>
+            <input id="submit-country" type="text" value={form.country} onChange={(e) => updateField('country', e.target.value)} className="input-field" placeholder="Canada" />
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="submit-company-url" className="block text-sm font-medium text-gray-700 mb-1.5">Company Website</label>
+          <input id="submit-company-url" type="url" value={form.company_url} onChange={(e) => updateField('company_url', e.target.value)} className="input-field" placeholder="https://company.com" />
+        </div>
+      </section>
+
+      {/* ━━━ Section 6: Humanized Description ━━━ */}
+      <section className="surface-elevated p-6 sm:p-8 space-y-5">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">The real talk</h2>
+          <p className="text-sm text-gray-600">
+            This is the version candidates actually see. Write it like you're explaining the role to a friend — what would a data engineer, accountant, or sales rep actually care about? What's the day-to-day like? What's the company culture <em>really</em> like? Go beyond the generic corporate speak.
+          </p>
+        </div>
+
+        <div>
+          <label htmlFor="submit-summary" className="block text-sm font-medium text-gray-700 mb-1.5">Humanized Description</label>
+          <textarea
+            id="submit-summary"
+            value={form.summary}
+            onChange={(e) => updateField('summary', e.target.value)}
+            rows={6}
+            className="input-field resize-y"
+            placeholder="Click 'Humanize with AI' above to auto-generate, or write your own plain-language description..."
+          />
+        </div>
+      </section>
+
+      {/* ━━━ Section 7: Standout Perks ━━━ */}
+      <section className="surface-elevated p-6 sm:p-8 space-y-5">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">Standout perks</h2>
+          <p className="text-sm text-gray-600">
+            Skip the basics everyone offers (health, dental, 401k, PTO, sick days). What <em>actually</em> makes this company different? Think: 4-day work week, equity for all, remote-first, learning budgets, sabbaticals, home office stipend.
+          </p>
+        </div>
+
+        {form.standout_perks && form.standout_perks.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {form.standout_perks.map((perk) => (
+              <span key={perk} className="inline-flex items-center gap-1 rounded-full bg-indigo-50 border border-indigo-200 px-2.5 py-1 text-xs text-indigo-700">
+                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                </svg>
+                {perk}
+                <button type="button" onClick={() => handleRemovePerk(perk)} className="text-indigo-400 hover:text-red-500 ml-0.5" aria-label={`Remove ${perk}`}>&times;</button>
+              </span>
+            ))}
+          </div>
         )}
+
+        <div className="flex gap-2">
+          <input
+            id="submit-perk-input"
+            type="text"
+            value={perkInput}
+            onChange={(e) => setPerkInput(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddPerk(); } }}
+            className="input-field flex-1"
+            placeholder="e.g., 4-day work week, equity, remote-first"
+          />
+          <button type="button" onClick={handleAddPerk} className="btn-secondary shrink-0">Add</button>
+        </div>
+      </section>
+
+      {/* ━━━ Section 8: Warm Intro + About You ━━━ */}
+      <section className="surface-elevated p-6 sm:p-8 space-y-5">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">Almost there</h2>
+          <p className="text-sm text-gray-600">
+            A bit about you so I can notify you when it's live and connect warm intro candidates.
+          </p>
+        </div>
+
+        {/* Warm intro toggle */}
+        <div className="rounded-xl bg-indigo-50/50 border border-indigo-200/40 p-4">
+          <div className="flex items-start gap-3">
+            <button
+              type="button"
+              role="switch"
+              aria-checked={form.warm_intro_ok}
+              aria-label="Allow warm intros for this role"
+              onClick={() => updateField('warm_intro_ok', !form.warm_intro_ok)}
+              className={`shrink-0 mt-0.5 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:ring-offset-2 ${
+                form.warm_intro_ok ? 'bg-indigo-600' : 'bg-gray-300'
+              }`}
+            >
+              <span className={`inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${
+                form.warm_intro_ok ? 'translate-x-6' : 'translate-x-1'
+              }`} />
+            </button>
+            <div>
+              <p className="text-sm font-medium text-gray-900">Allow warm intros for this role</p>
+              <p className="text-xs text-gray-600 leading-relaxed mt-0.5">
+                Candidates can request a warm intro through me. I'll send you their info so you can connect directly. Never shared publicly.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Contact info */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="submit-your-name" className="block text-sm font-medium text-gray-700 mb-1.5">Your Name</label>
+            <input id="submit-your-name" type="text" value={form.submitter_name || ''} onChange={(e) => updateField('submitter_name', e.target.value)} className="input-field" placeholder="Jane Doe" />
+          </div>
+          <div>
+            <label htmlFor="submit-your-email" className="block text-sm font-medium text-gray-700 mb-1.5">Your Email</label>
+            <input id="submit-your-email" type="email" value={form.submitter_email} onChange={(e) => updateField('submitter_email', e.target.value)} className="input-field" placeholder="you@email.com" />
+          </div>
+        </div>
+
+        {/* Honeypot */}
+        <div className="absolute -left-[9999px]" aria-hidden="true">
+          <label htmlFor="website">Website</label>
+          <input id="website" type="text" value={website} onChange={(e) => setWebsite(e.target.value)} tabIndex={-1} autoComplete="off" />
+        </div>
+      </section>
+
+      {/* ━━━ Preview Card ━━━ */}
+      {(form.title || form.company || form.summary) && (
+        <section className="space-y-2">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Preview — how candidates will see it</p>
+          <div className="surface-elevated p-5 relative overflow-hidden">
+            <h4 className="font-semibold text-gray-900">{form.title || 'Untitled'}</h4>
+            <p className="text-sm text-gray-600 mt-0.5">{form.company || 'No company'}</p>
+            {form.location && <p className="text-xs text-gray-600 mt-1">{form.location}{form.country ? `, ${form.country}` : ''}</p>}
+            {form.summary && <p className="text-sm text-gray-600 leading-relaxed mt-2 line-clamp-3">{form.summary}</p>}
+            {form.standout_perks && form.standout_perks.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {form.standout_perks.slice(0, 3).map((perk) => (
+                  <span key={perk} className="inline-flex items-center gap-1 rounded-full bg-indigo-50 border border-indigo-200 px-2 py-0.5 text-xs text-indigo-700">
+                    <svg className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                    </svg>
+                    {perk}
+                  </span>
+                ))}
+                {form.standout_perks.length > 3 && (
+                  <span className="text-xs text-gray-600">+{form.standout_perks.length - 3} more</span>
+                )}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ━━━ Submit Button ━━━ */}
+      <div className="flex justify-center pb-8">
+        <button
+          type="button"
+          onClick={handleSubmit}
+          disabled={submitting || !form.title || !form.company}
+          className="btn-primary px-8 py-3 text-base disabled:opacity-40"
+          aria-busy={submitting}
+        >
+          {submitting ? (
+            <>
+              <svg className="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              Submitting...
+            </>
+          ) : (
+            <>
+              Submit for Review
+              <svg className="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+              </svg>
+            </>
+          )}
+        </button>
       </div>
     </div>
   );

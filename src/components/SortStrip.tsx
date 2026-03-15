@@ -38,13 +38,13 @@ export default function SortStrip({ sort, onSortChange, meta, onRefresh, tags, o
     <div className="space-y-3 lg:hidden">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-sm font-bold text-indigo-600">
+          <span className="text-sm font-bold text-brand-500">
             {meta?.total ?? 0} {meta?.total === 1 ? 'role' : 'roles'}
           </span>
           <select
             value={sort}
             onChange={(e) => handleSortChange(e.target.value as SortOption)}
-            className="bg-white border border-gray-200 rounded-lg text-sm text-gray-700 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            className="bg-white border border-gray-200 rounded-lg text-sm text-gray-700 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
           >
             <option value="newest">Newest first</option>
             <option value="oldest">Oldest first</option>
@@ -67,7 +67,7 @@ export default function SortStrip({ sort, onSortChange, meta, onRefresh, tags, o
             onClick={() => toggleTag(cat)}
             className={`shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               tags.includes(cat)
-                ? 'bg-indigo-600 text-white'
+                ? 'bg-brand-500 text-white'
                 : 'bg-gray-100 text-gray-600'
             }`}
           >

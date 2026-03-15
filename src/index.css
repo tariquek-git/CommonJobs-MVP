@@ -14,7 +14,7 @@
   }
 
   ::selection {
-    background-color: rgba(99, 102, 241, 0.15);
+    background-color: rgba(99, 91, 255, 0.15);
     color: inherit;
   }
 
@@ -34,47 +34,66 @@
 @layer components {
   /* ---- Surfaces ---- */
   .surface-elevated {
-    @apply bg-white border border-gray-200 rounded-xl shadow-sm shadow-gray-900/[0.03];
+    @apply bg-white rounded-2xl;
+    border: 1px solid rgba(229, 231, 235, 0.5);
+    box-shadow: 0 2px 5px -1px rgba(50,50,93,0.25), 0 1px 3px -1px rgba(0,0,0,0.3);
   }
 
   .surface-tinted {
-    @apply bg-indigo-50/60 border border-indigo-100 rounded-xl;
+    @apply rounded-2xl;
+    background-color: rgba(245, 243, 255, 0.6);
+    border: 1px solid #C4B5FD;
   }
 
   .glass-panel {
-    @apply bg-white/90 backdrop-blur-xl border border-gray-200/60 rounded-xl shadow-2xl;
+    @apply backdrop-blur-xl rounded-2xl shadow-2xl;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(229, 231, 235, 0.6);
   }
 
   .glass-surface {
-    @apply bg-white/80 backdrop-blur-xl border border-gray-200/60;
+    @apply backdrop-blur-xl;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(229, 231, 235, 0.6);
   }
 
   /* ---- Buttons ---- */
   .btn-primary {
-    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-lg
-           bg-indigo-600 text-white font-semibold text-sm
-           hover:bg-indigo-700 active:bg-indigo-800
-
-           transition-colors duration-200
-           focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:ring-offset-2
+    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-full
+           bg-brand-500 text-white font-semibold text-sm
+           hover:bg-brand-600
+           active:bg-brand-700
+           transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-offset-2
            focus:ring-offset-white
            shadow-sm;
+    --tw-ring-color: rgba(99, 91, 255, 0.4);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 0 14px rgba(99, 91, 255, 0.4);
+  }
+  .btn-primary:active {
+    transform: scale(0.98);
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-lg
+    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-full
            bg-gray-100 text-gray-700 font-medium text-sm
            border border-gray-200
            hover:bg-gray-200 active:bg-gray-300
-           transition-colors duration-200
-           focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:ring-offset-2
+           transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-offset-2
            focus:ring-offset-white;
+    --tw-ring-color: rgba(99, 91, 255, 0.3);
+  }
+  .btn-secondary:active {
+    transform: scale(0.98);
   }
 
   .btn-ghost {
     @apply inline-flex items-center justify-center px-3 py-2 rounded-lg
            text-gray-600 font-medium text-sm
-           hover:text-gray-900 hover:bg-gray-100
+           hover:text-brand-500 hover:bg-brand-50
            transition-colors duration-200;
   }
 
@@ -84,8 +103,12 @@
            bg-white border border-gray-300
            text-gray-900
            placeholder-gray-500
-           focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-300
+           focus:outline-none focus:ring-2
            transition-all duration-200;
+    --tw-ring-color: rgba(99, 91, 255, 0.2);
+  }
+  .input-field:focus {
+    border-color: #8B5CF6;
   }
 
   /* ---- Badges ---- */
@@ -94,23 +117,21 @@
   }
 
   .badge-community {
-    @apply badge bg-indigo-50 text-indigo-700
-           border border-indigo-200/60;
+    @apply badge bg-brand-50 text-brand-700;
+    border: 1px solid rgba(196, 181, 253, 0.6);
   }
 
   .badge-pending {
-    @apply badge bg-amber-50 text-amber-700
-           border border-amber-200;
+    @apply badge bg-amber-50 text-amber-700 border border-amber-200;
   }
 
   .badge-active {
-    @apply badge bg-indigo-50 text-indigo-700
-           border border-indigo-200/60;
+    @apply badge bg-brand-50 text-brand-700;
+    border: 1px solid rgba(196, 181, 253, 0.6);
   }
 
   .badge-rejected {
-    @apply badge bg-red-50 text-red-700
-           border border-red-200;
+    @apply badge bg-red-50 text-red-700 border border-red-200;
   }
 
   /* ---- Filter chip ---- */
@@ -124,13 +145,58 @@
   }
   .filter-chip-active {
     @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium
-           bg-indigo-600 text-white
-           border border-indigo-600
+           bg-brand-500 text-white
+           border border-brand-500
            cursor-pointer select-none;
   }
 
   /* ---- Gradient text ---- */
   .gradient-text {
-    @apply bg-gradient-to-r from-indigo-600 to-indigo-400 bg-clip-text text-transparent;
+    background: linear-gradient(to right, #635BFF, #FF3B8B, #FF6B00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ---- Gradient border on hover (Stripe-inspired warm) ---- */
+  .gradient-border {
+    position: relative;
+  }
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, #635BFF, #FF3B8B, #FF6B00);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+  .gradient-border:hover::before {
+    opacity: 1;
+  }
+
+  /* ---- Stripe-style warm card accent ---- */
+  .card-accent-warm {
+    position: relative;
+  }
+  .card-accent-warm::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(to bottom, #635BFF, #FF3B8B, #FF6B00);
+    border-radius: 3px 0 0 3px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .card-accent-warm:hover::after {
+    opacity: 1;
   }
 }

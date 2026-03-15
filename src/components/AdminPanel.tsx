@@ -5,74 +5,68 @@ import type { AnalyticsData, WarmIntroRecord } from '../lib/api';
 import type { Job } from '../lib/types';
 import { getRelativeTimeLabel } from '../lib/date';
 
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
-
-function GoogleLoginForm({ onGoogleLogin, loading, error }: {
-  onGoogleLogin: (credential: string) => void;
+function LoginForm({ onLogin, loading, error }: {
+  onLogin: (username: string, password: string) => void;
   loading: boolean;
   error: string | null;
 }) {
-  // Handle the OAuth callback — Google redirects back with id_token in the hash
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (hash.includes('id_token=')) {
-      const params = new URLSearchParams(hash.substring(1));
-      const idToken = params.get('id_token');
-      if (idToken) {
-        // Clean the URL
-        window.history.replaceState(null, '', window.location.pathname);
-        onGoogleLogin(idToken);
-      }
-    }
-  }, [onGoogleLogin]);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleGoogleSignIn = () => {
-    const redirectUri = `${window.location.origin}/admin`;
-    const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
-    authUrl.searchParams.set('client_id', GOOGLE_CLIENT_ID);
-    authUrl.searchParams.set('redirect_uri', redirectUri);
-    authUrl.searchParams.set('response_type', 'id_token');
-    authUrl.searchParams.set('scope', 'openid email');
-    authUrl.searchParams.set('nonce', crypto.randomUUID());
-    window.location.href = authUrl.toString();
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (username && password) onLogin(username, password);
   };
 
   return (
     <div className="max-w-sm mx-auto surface-elevated p-8">
       <div className="text-center mb-6">
-        <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 mb-3">
-          <svg className="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 mb-3">
+          <svg className="h-6 w-6 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
           </svg>
         </div>
         <h2 className="text-xl font-semibold text-gray-900">Admin Login</h2>
-        <p className="text-sm text-gray-500 mt-1">Sign in with your Google account</p>
+        <p className="text-sm text-gray-500 mt-1">Sign in to manage jobs</p>
       </div>
       {error && (
         <div className="rounded-lg bg-red-50 border border-red-200 p-3 mb-4">
           <p className="text-sm text-red-700">{error}</p>
         </div>
       )}
-      {loading ? (
-        <div className="text-center text-gray-500 py-4">Signing in...</div>
-      ) : !GOOGLE_CLIENT_ID ? (
-        <div className="rounded-lg bg-amber-50 border border-amber-200 p-3">
-          <p className="text-sm text-amber-700">Google Client ID not configured. Set VITE_GOOGLE_CLIENT_ID.</p>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="admin-username" className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+          <input
+            id="admin-username"
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+            autoComplete="username"
+            required
+          />
         </div>
-      ) : (
+        <div>
+          <label htmlFor="admin-password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <input
+            id="admin-password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+            autoComplete="current-password"
+            required
+          />
+        </div>
         <button
-          onClick={handleGoogleSignIn}
-          className="w-full flex items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
+          type="submit"
+          disabled={loading || !username || !password}
+          className="btn-primary w-full py-2.5 disabled:opacity-40"
         >
-          <svg className="h-5 w-5" viewBox="0 0 24 24">
-            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
-            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-          </svg>
-          Sign in with Google
+          {loading ? 'Signing in...' : 'Sign In'}
         </button>
-      )}
+      </form>
     </div>
   );
 }
@@ -92,11 +86,15 @@ const EDITABLE_FIELDS: { key: keyof Job; label: string; type: 'text' | 'textarea
   { key: 'company', label: 'Company', type: 'text' },
   { key: 'location', label: 'Location', type: 'text' },
   { key: 'country', label: 'Country', type: 'text' },
+  { key: 'salary_range', label: 'Salary Range', type: 'text' },
+  { key: 'employment_type', label: 'Employment Type', type: 'text' },
+  { key: 'work_arrangement', label: 'Work Arrangement', type: 'text' },
   { key: 'apply_url', label: 'Apply URL', type: 'text' },
   { key: 'company_url', label: 'Company URL', type: 'text' },
   { key: 'company_logo_url', label: 'Logo URL', type: 'text' },
   { key: 'summary', label: 'Summary', type: 'textarea' },
   { key: 'description', label: 'Description', type: 'textarea' },
+  { key: 'featured', label: 'Featured', type: 'boolean' },
   { key: 'warm_intro_ok', label: 'Warm intro OK', type: 'boolean' },
   { key: 'standout_perks', label: 'Standout perks (comma-separated)', type: 'tags' },
   { key: 'tags', label: 'Tags (comma-separated)', type: 'tags' },
@@ -113,6 +111,15 @@ function JobRow({ job, token, onStatusChange, onJobUpdated }: {
   const [editing, setEditing] = useState<Record<string, string | boolean | string[]>>({});
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+
+  const toggleFeatured = async () => {
+    try {
+      await updateJob(token, job.id, { featured: !job.featured } as Partial<Job>);
+      onJobUpdated();
+    } catch {
+      // silently fail — user can retry
+    }
+  };
 
   const startEditing = () => {
     const initial: Record<string, string | boolean | string[]> = {};
@@ -172,12 +179,20 @@ function JobRow({ job, token, onStatusChange, onJobUpdated }: {
           <div className="flex items-center gap-2 mb-1">
             <h3 className="text-sm font-medium text-gray-900 truncate">{job.title}</h3>
             <StatusBadge status={job.status} />
+            {job.featured && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700 border border-amber-200">
+                <svg className="h-2.5 w-2.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+                Featured
+              </span>
+            )}
           </div>
           <p className="text-xs text-gray-500">
             {job.company} · {job.location || 'No location'} · {getRelativeTimeLabel(job.created_at)}
           </p>
           {job.submitter_email && (
-            <p className="text-xs text-indigo-600/70 mt-0.5">{job.submitter_email}</p>
+            <p className="text-xs text-brand-500/70 mt-0.5">{job.submitter_email}</p>
           )}
           {job.submission_ref && (
             <p className="text-xs text-gray-400 mt-0.5 font-mono">{job.submission_ref}</p>
@@ -185,8 +200,19 @@ function JobRow({ job, token, onStatusChange, onJobUpdated }: {
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
           <button
+            onClick={toggleFeatured}
+            className={`text-xs px-2.5 py-1.5 rounded-lg transition-colors ${
+              job.featured
+                ? 'bg-amber-100 text-amber-800 hover:bg-amber-200'
+                : 'bg-amber-50 text-amber-600 hover:bg-amber-100'
+            }`}
+            title={job.featured ? 'Remove featured status' : 'Mark as featured'}
+          >
+            {job.featured ? 'Unfeature' : 'Feature'}
+          </button>
+          <button
             onClick={() => expanded ? setExpanded(false) : startEditing()}
-            className="text-xs px-2.5 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors"
+            className="text-xs px-2.5 py-1.5 rounded-lg bg-brand-50 text-brand-700 hover:bg-brand-100 transition-colors"
           >
             {expanded ? 'Close' : 'Edit'}
           </button>
@@ -233,7 +259,7 @@ function JobRow({ job, token, onStatusChange, onJobUpdated }: {
                     type="checkbox"
                     checked={editing[field.key] as boolean}
                     onChange={(e) => setEditing({ ...editing, [field.key]: e.target.checked })}
-                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="rounded border-gray-300 text-brand-500 focus:ring-brand-500"
                   />
                   <span className="text-xs text-gray-700">{editing[field.key] ? 'Yes' : 'No'}</span>
                 </label>
@@ -242,14 +268,14 @@ function JobRow({ job, token, onStatusChange, onJobUpdated }: {
                   value={editing[field.key] as string}
                   onChange={(e) => setEditing({ ...editing, [field.key]: e.target.value })}
                   rows={3}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               ) : (
                 <input
                   type="text"
                   value={editing[field.key] as string}
                   onChange={(e) => setEditing({ ...editing, [field.key]: e.target.value })}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
               )}
             </div>
@@ -384,7 +410,7 @@ function AnalyticsTab({ token }: { token: string }) {
                   <span className="text-gray-900 truncate">{job.title}</span>
                   <span className="text-gray-400 text-xs shrink-0">{job.company}</span>
                 </div>
-                <span className="text-indigo-600 font-semibold tabular-nums shrink-0 ml-3">
+                <span className="text-brand-500 font-semibold tabular-nums shrink-0 ml-3">
                   {job.clicks}
                 </span>
               </div>
@@ -439,7 +465,7 @@ function IntroCard({ intro, onStatusChange }: { intro: WarmIntroRecord; onStatus
         <div className="min-w-0">
           <h3 className="text-sm font-semibold text-gray-900">{intro.name}</h3>
           <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-            <a href={`mailto:${intro.email}`} className="text-xs text-indigo-600 hover:underline">{intro.email}</a>
+            <a href={`mailto:${intro.email}`} className="text-xs text-brand-500 hover:underline">{intro.email}</a>
             {intro.linkedin && (
               <a href={intro.linkedin} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">
                 LinkedIn
@@ -468,7 +494,7 @@ function IntroCard({ intro, onStatusChange }: { intro: WarmIntroRecord; onStatus
         {intro.job_submitter_email && (
           <p>
             <span className="text-gray-400">Job posted by:</span>{' '}
-            <a href={`mailto:${intro.job_submitter_email}`} className="text-indigo-600 hover:underline">
+            <a href={`mailto:${intro.job_submitter_email}`} className="text-brand-500 hover:underline">
               {intro.job_submitter_name || intro.job_submitter_email}
             </a>
           </p>
@@ -608,17 +634,69 @@ function sortJobs(jobs: Job[], sortKey: SortKey): Job[] {
 export default function AdminPanel() {
   const {
     token, jobs, runtime, loading, error,
-    statusFilter, loginWithGoogle, logout,
+    statusFilter, login, logout,
     setStatusFilter, changeJobStatus, refreshJobs,
   } = useAdmin();
   const [activeTab, setActiveTab] = useState<'jobs' | 'intros' | 'analytics'>('jobs');
   const [introsKey, setIntrosKey] = useState(0);
   const [sortKey, setSortKey] = useState<SortKey>('newest');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
 
-  const sortedJobs = sortJobs(jobs, sortKey);
+  const filteredJobs = searchQuery.trim()
+    ? jobs.filter((j) => {
+        const q = searchQuery.toLowerCase();
+        return j.title.toLowerCase().includes(q) || j.company.toLowerCase().includes(q) || (j.location?.toLowerCase().includes(q) ?? false) || (j.submitter_email?.toLowerCase().includes(q) ?? false) || (j.submission_ref?.toLowerCase().includes(q) ?? false);
+      })
+    : jobs;
+  const sortedJobs = sortJobs(filteredJobs, sortKey);
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === sortedJobs.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(sortedJobs.map((j) => j.id)));
+    }
+  };
+
+  const handleBulkAction = async (status: string) => {
+    if (selectedIds.size === 0) return;
+    setBulkLoading(true);
+    try {
+      await Promise.all(Array.from(selectedIds).map((id) => changeJobStatus(id, status)));
+      setSelectedIds(new Set());
+    } finally {
+      setBulkLoading(false);
+    }
+  };
+
+  const handleExportCsv = () => {
+    const headers = ['title', 'company', 'location', 'status', 'salary_range', 'employment_type', 'work_arrangement', 'posted_date', 'submitter_email', 'submission_ref'];
+    const rows = sortedJobs.map((j) => headers.map((h) => {
+      const val = j[h as keyof Job];
+      return typeof val === 'string' ? `"${val.replace(/"/g, '""')}"` : String(val ?? '');
+    }).join(','));
+    const csv = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `fintech-commons-jobs-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   if (!token) {
-    return <GoogleLoginForm onGoogleLogin={loginWithGoogle} loading={loading} error={error} />;
+    return <LoginForm onLogin={login} loading={loading} error={error} />;
   }
 
   return (
@@ -689,6 +767,28 @@ export default function AdminPanel() {
             </div>
           )}
 
+          {/* Search bar */}
+          <div className="flex items-center gap-3">
+            <div className="flex-1 relative">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+              </svg>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search jobs by title, company, location, email, ref..."
+                className="w-full rounded-lg border border-gray-200 bg-white pl-10 pr-3 py-2 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500"
+              />
+            </div>
+            <button onClick={handleExportCsv} className="btn-ghost text-xs shrink-0" title="Export CSV">
+              <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
+              Export
+            </button>
+          </div>
+
           {/* Status filter + sort */}
           <div className="flex items-center gap-3">
             <div className="flex-1 flex gap-1 rounded-xl bg-gray-100/60 p-1">
@@ -709,14 +809,33 @@ export default function AdminPanel() {
             <select
               value={sortKey}
               onChange={(e) => setSortKey(e.target.value as SortKey)}
-              className="rounded-lg border border-gray-200 bg-white px-2 py-2 text-xs text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="rounded-lg border border-gray-200 bg-white px-2 py-2 text-xs text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="newest">Newest first</option>
               <option value="oldest">Oldest first</option>
-              <option value="company">Company A–Z</option>
-              <option value="title">Title A–Z</option>
+              <option value="company">Company A-Z</option>
+              <option value="title">Title A-Z</option>
             </select>
           </div>
+
+          {/* Bulk action bar */}
+          {selectedIds.size > 0 && (
+            <div className="flex items-center gap-2 rounded-xl bg-brand-50 border border-brand-200/60 p-3">
+              <span className="text-xs font-medium text-brand-700">{selectedIds.size} selected</span>
+              <button onClick={() => handleBulkAction('active')} disabled={bulkLoading} className="text-xs px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors disabled:opacity-50">
+                Approve All
+              </button>
+              <button onClick={() => handleBulkAction('rejected')} disabled={bulkLoading} className="text-xs px-2.5 py-1.5 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 transition-colors disabled:opacity-50">
+                Reject All
+              </button>
+              <button onClick={() => handleBulkAction('archived')} disabled={bulkLoading} className="text-xs px-2.5 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors disabled:opacity-50">
+                Archive All
+              </button>
+              <button onClick={() => setSelectedIds(new Set())} className="text-xs text-gray-500 hover:text-gray-700 ml-auto">
+                Clear
+              </button>
+            </div>
+          )}
 
           {error && (
             <div className="rounded-xl bg-red-50 border border-red-200 p-3">
@@ -726,12 +845,32 @@ export default function AdminPanel() {
 
           {loading ? (
             <div className="text-center text-gray-500 py-8">Loading...</div>
-          ) : jobs.length === 0 ? (
-            <div className="text-center text-gray-500 py-8">No jobs with this status.</div>
+          ) : sortedJobs.length === 0 ? (
+            <div className="text-center text-gray-500 py-8">{searchQuery ? 'No jobs match your search.' : 'No jobs with this status.'}</div>
           ) : (
             <div className="space-y-2">
+              {/* Select all */}
+              <div className="flex items-center gap-2 px-4 py-1">
+                <input
+                  type="checkbox"
+                  checked={selectedIds.size === sortedJobs.length && sortedJobs.length > 0}
+                  onChange={toggleSelectAll}
+                  className="rounded border-gray-300 text-brand-500 focus:ring-brand-500"
+                />
+                <span className="text-xs text-gray-500">{sortedJobs.length} jobs</span>
+              </div>
               {sortedJobs.map((job) => (
-                <JobRow key={job.id} job={job} token={token} onStatusChange={changeJobStatus} onJobUpdated={refreshJobs} />
+                <div key={job.id} className="flex items-start gap-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(job.id)}
+                    onChange={() => toggleSelect(job.id)}
+                    className="mt-5 rounded border-gray-300 text-brand-500 focus:ring-brand-500 shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <JobRow job={job} token={token} onStatusChange={changeJobStatus} onJobUpdated={refreshJobs} />
+                  </div>
+                </div>
               ))}
             </div>
           )}

@@ -25,7 +25,7 @@ export default function SearchBar({ value, onChange, placeholder = 'Search roles
 
   return (
     <div className="relative flex items-center">
-      <div className={`absolute left-3.5 transition-colors duration-200 ${focused ? 'text-indigo-400' : 'text-gray-400'}`}>
+      <div className={`absolute left-3.5 transition-colors duration-200 ${focused ? 'text-brand-400' : 'text-gray-400'}`}>
         <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
         </svg>

@@ -1,49 +1,13 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import type { Job } from '../lib/types';
 import { getRelativeTimeLabel } from '../lib/date';
 import { trackClick } from '../lib/api';
 import { shareJob, getUtmParams } from '../lib/utils';
+import CompanyLogo from './CompanyLogo';
 
 interface JobCardProps {
   job: Job;
   onSelect: (job: Job) => void;
-}
-
-function getAutoLogoUrl(job: Job): string | null {
-  if (job.company_logo_url) return job.company_logo_url;
-  if (job.company_url) {
-    try {
-      return `https://logo.clearbit.com/${new URL(job.company_url).hostname}`;
-    } catch { /* ignore */ }
-  }
-  return null;
-}
-
-function CompanyLogo({ job }: { job: Job }) {
-  const logoUrl = getAutoLogoUrl(job);
-  if (logoUrl) {
-    return (
-      <img
-        src={logoUrl}
-        alt={`${job.company} logo`}
-        className="h-14 w-14 rounded-xl object-contain bg-gray-100 p-1.5"
-        onError={(e) => {
-          (e.target as HTMLImageElement).style.display = 'none';
-          (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-        }}
-      />
-    );
-  }
-  return null;
-}
-
-function FallbackIcon({ company }: { company: string }) {
-  const letter = company.charAt(0).toUpperCase();
-  return (
-    <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-indigo-50 text-base font-bold text-indigo-600">
-      {letter}
-    </div>
-  );
 }
 
 function getDaysUntilExpiry(expiresAt: string | null): number | null {
@@ -52,7 +16,7 @@ function getDaysUntilExpiry(expiresAt: string | null): number | null {
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
 
-export default function JobCard({ job, onSelect }: JobCardProps) {
+export default memo(function JobCard({ job, onSelect }: JobCardProps) {
   const [showCopied, setShowCopied] = useState(false);
 
   const handleApply = (e: React.MouseEvent) => {
@@ -76,8 +40,8 @@ export default function JobCard({ job, onSelect }: JobCardProps) {
     <article
       onClick={() => onSelect(job)}
       className="relative surface-elevated p-6 lg:p-7 cursor-pointer overflow-hidden
-        hover:shadow-md hover:border-indigo-300 hover:-translate-y-0.5
-        transition-all duration-300 ease-out group"
+        hover:shadow-card-hover hover:-translate-y-0.5
+        transition-all duration-300 ease-out group gradient-border"
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
@@ -89,27 +53,30 @@ export default function JobCard({ job, onSelect }: JobCardProps) {
     >
       <div className="flex items-start gap-4">
         <div className="shrink-0">
-          {getAutoLogoUrl(job) ? (
-            <>
-              <CompanyLogo job={job} />
-              <div className="hidden">
-                <FallbackIcon company={job.company} />
-              </div>
-            </>
-          ) : (
-            <FallbackIcon company={job.company} />
-          )}
+          <CompanyLogo
+            companyName={job.company}
+            companyUrl={job.company_url}
+            companyLogoUrl={job.company_logo_url}
+          />
         </div>
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors leading-snug">
+              <h3 className="text-lg font-semibold text-gray-900 group-hover:text-brand-500 transition-colors leading-snug">
                 {job.title}
               </h3>
               <p className="text-sm font-medium text-gray-600 mt-1">{job.company}</p>
             </div>
             <div className="shrink-0 text-right flex items-center gap-1.5">
+              {job.featured && (
+                <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700 border border-amber-200/60">
+                  <svg className="h-2.5 w-2.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  Featured
+                </span>
+              )}
               {(() => {
                 const diffDays = Math.floor((Date.now() - new Date(job.posted_date).getTime()) / (1000 * 60 * 60 * 24));
                 if (diffDays < 7) {
@@ -148,6 +115,21 @@ export default function JobCard({ job, onSelect }: JobCardProps) {
                 {job.location}
               </span>
             )}
+            {job.salary_range && (
+              <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-1.5 py-0.5 text-xs font-medium text-emerald-700 border border-emerald-200/60">
+                {job.salary_range}
+              </span>
+            )}
+            {job.employment_type && (
+              <span className="inline-flex items-center rounded-md bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-600">
+                {job.employment_type}
+              </span>
+            )}
+            {job.work_arrangement && (
+              <span className="inline-flex items-center rounded-md bg-blue-50 px-1.5 py-0.5 text-xs font-medium text-blue-700 border border-blue-200/60">
+                {job.work_arrangement}
+              </span>
+            )}
           </div>
 
           {job.standout_perks && job.standout_perks.length > 0 && (
@@ -155,7 +137,7 @@ export default function JobCard({ job, onSelect }: JobCardProps) {
               {job.standout_perks.slice(0, 3).map((perk) => (
                 <span
                   key={perk}
-                  className="inline-flex items-center gap-1 rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700"
+                  className="inline-flex items-center gap-1 rounded-md bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700"
                 >
                   <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -164,7 +146,7 @@ export default function JobCard({ job, onSelect }: JobCardProps) {
                 </span>
               ))}
               {job.standout_perks.length > 3 && (
-                <span className="text-xs text-indigo-600 font-medium">
+                <span className="text-xs text-brand-500 font-medium">
                   +{job.standout_perks.length - 3} more
                 </span>
               )}
@@ -189,7 +171,7 @@ export default function JobCard({ job, onSelect }: JobCardProps) {
                 Reviewed
               </span>
               {job.warm_intro_ok && (
-                <span className="inline-flex items-center gap-1 rounded-md bg-indigo-50 px-2 py-0.5 text-[11px] font-medium text-indigo-700">
+                <span className="inline-flex items-center gap-1 rounded-md bg-brand-50 px-2 py-0.5 text-[11px] font-medium text-brand-700">
                   <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                   </svg>
@@ -200,7 +182,7 @@ export default function JobCard({ job, onSelect }: JobCardProps) {
             <div className="flex items-center gap-2">
               <button
                 onClick={handleShare}
-                className="relative rounded-full p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+                className="relative rounded-full p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 transition-colors"
                 aria-label="Share job"
                 title="Share"
               >
@@ -230,4 +212,4 @@ export default function JobCard({ job, onSelect }: JobCardProps) {
       </div>
     </article>
   );
-}
+})

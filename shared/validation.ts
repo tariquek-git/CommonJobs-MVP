@@ -5,7 +5,8 @@ export interface ValidationResult {
   errors: string[];
 }
 
-const URL_PATTERN = /^https?:\/\/.+\..+/;
+// Require HTTPS, valid domain with TLD of 2+ chars, no IP-only URLs
+const URL_PATTERN = /^https:\/\/[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}(\/.*)?$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_TITLE_LENGTH = 200;
 const MAX_COMPANY_LENGTH = 150;
@@ -38,14 +39,14 @@ export function validateSubmission(payload: unknown): ValidationResult {
 
   // Optional fields with validation
   if (data.apply_url !== undefined && data.apply_url !== null && data.apply_url !== '') {
-    if (typeof data.apply_url !== 'string' || !URL_PATTERN.test(data.apply_url)) {
-      errors.push('Apply URL must be a valid HTTP/HTTPS URL');
+    if (typeof data.apply_url !== 'string' || data.apply_url.toLowerCase().startsWith('javascript:') || !URL_PATTERN.test(data.apply_url)) {
+      errors.push('Apply URL must be a valid HTTPS URL with a proper domain');
     }
   }
 
   if (data.company_url !== undefined && data.company_url !== null && data.company_url !== '') {
-    if (typeof data.company_url !== 'string' || !URL_PATTERN.test(data.company_url)) {
-      errors.push('Company URL must be a valid HTTP/HTTPS URL');
+    if (typeof data.company_url !== 'string' || data.company_url.toLowerCase().startsWith('javascript:') || !URL_PATTERN.test(data.company_url)) {
+      errors.push('Company URL must be a valid HTTPS URL with a proper domain');
     }
   }
 
@@ -116,6 +117,12 @@ export function sanitizeSubmission(payload: SubmissionPayload): SubmissionPayloa
     apply_url: payload.apply_url?.trim(),
     company_url: payload.company_url?.trim(),
     tags: payload.tags?.map((t) => sanitizeString(t)),
+    standout_perks: payload.standout_perks?.map((p) => sanitizeString(p)),
+    submitter_name: payload.submitter_name ? sanitizeString(payload.submitter_name) : undefined,
     submitter_email: payload.submitter_email?.trim(),
+    warm_intro_ok: typeof payload.warm_intro_ok === 'boolean' ? payload.warm_intro_ok : true,
+    salary_range: payload.salary_range ? sanitizeString(payload.salary_range) : undefined,
+    employment_type: payload.employment_type ? sanitizeString(payload.employment_type) : undefined,
+    work_arrangement: payload.work_arrangement ? sanitizeString(payload.work_arrangement) : undefined,
   };
 }

@@ -11,7 +11,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (rateLimitOrReject(ip, RATE_LIMITS.aiScrape, res)) return;
 
   try {
-    const { description, title } = req.body as { description: string; title: string };
+    const { description, title, preExtracted } = req.body as {
+      description: string;
+      title: string;
+      preExtracted?: Record<string, string | undefined>;
+    };
 
     if (!description || typeof description !== 'string' || description.trim().length < 20) {
       return res.status(400).json({
@@ -20,14 +24,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    if (!title || typeof title !== 'string' || title.trim().length < 2) {
-      return res.status(400).json({
-        error: 'Title is required',
-        code: 'BAD_REQUEST',
-      });
-    }
+    const safeTitle = (title && typeof title === 'string') ? title.trim() : '';
 
-    const result = await humanizeJobPost(description.trim(), title.trim());
+    const result = await humanizeJobPost(description.trim(), safeTitle, preExtracted);
     return res.status(200).json(result);
   } catch (err) {
     const { logger } = await import('../../lib/logger.js');

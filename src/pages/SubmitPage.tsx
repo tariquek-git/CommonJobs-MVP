@@ -1,7 +1,15 @@
+import { useEffect } from 'react';
+import { usePostHog } from '@posthog/react';
 import Header from '../components/Header';
 import SubmitForm from '../components/SubmitForm';
 
 export default function SubmitPage() {
+  const posthog = usePostHog();
+
+  useEffect(() => {
+    posthog?.capture('page_viewed', { page: 'submit' });
+  }, [posthog]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />

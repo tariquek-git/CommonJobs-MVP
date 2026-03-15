@@ -81,7 +81,7 @@ export default function JobPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="h-8 w-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+        <div className="h-8 w-8 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -102,7 +102,7 @@ export default function JobPage() {
       {/* Nav */}
       <header className="border-b border-gray-200 bg-white/80 backdrop-blur-sm">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-3">
-          <Link to="/" className="text-indigo-600 hover:text-indigo-700 text-sm font-medium">
+          <Link to="/" className="text-brand-500 hover:text-brand-700 text-sm font-medium">
             &larr; All Jobs
           </Link>
         </div>
@@ -112,7 +112,7 @@ export default function JobPage() {
         <article className="surface-elevated p-6 sm:p-8 space-y-6">
           {/* Header */}
           <div className="flex items-start gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-indigo-50 text-lg font-bold text-indigo-600 shrink-0">
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-brand-50 text-lg font-bold text-brand-500 shrink-0">
               {(() => {
                 const logoUrl = job.company_logo_url || (job.company_url ? (() => { try { return `https://logo.clearbit.com/${new URL(job.company_url).hostname}`; } catch { return null; } })() : null);
                 return logoUrl ? (
@@ -156,7 +156,7 @@ export default function JobPage() {
               Reviewed
             </span>
             {job.warm_intro_ok && (
-              <span className="inline-flex items-center gap-1 rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700">
+              <span className="inline-flex items-center gap-1 rounded-md bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700">
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                 </svg>
@@ -213,7 +213,7 @@ export default function JobPage() {
                   href={job.company_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-indigo-600 hover:text-indigo-700"
+                  className="text-brand-500 hover:text-brand-700"
                 >
                   Company website
                 </a>

@@ -56,7 +56,7 @@ export default function BottomNav() {
                 to={item.path}
                 className={`flex flex-col items-center gap-0.5 active:scale-95 transition-transform min-w-[64px] ${
                   location.pathname === item.path
-                    ? 'text-indigo-600'
+                    ? 'text-brand-500'
                     : 'text-gray-600'
                 }`}
               >

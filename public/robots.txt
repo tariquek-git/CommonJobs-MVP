@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /api/
 
-Sitemap: https://commonsjobs.com/sitemap.xml
+Sitemap: https://www.fintechcommons.com/sitemap.xml

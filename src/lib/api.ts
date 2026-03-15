@@ -12,6 +12,15 @@ import type {
 
 const BASE = '/api';
 
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+  }
+}
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     headers: { 'Content-Type': 'application/json' },
@@ -20,7 +29,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({ error: 'Request failed' }));
-    throw new Error(body.error || `HTTP ${res.status}`);
+    throw new ApiError(body.error || `HTTP ${res.status}`, res.status);
   }
 
   return res.json();
@@ -82,26 +91,58 @@ export async function requestWarmIntro(payload: WarmIntroPayload): Promise<{ suc
 // ── AI API ──
 
 export interface HumanizeResponse {
+  rejection?: string;
+  title?: string;
+  company?: string;
+  location?: string;
+  country?: string;
+  company_url?: string;
+  salary_range?: string;
+  employment_type?: string;
+  work_arrangement?: string;
   humanized_description: string;
   standout_perks: string[];
+  prompt_version?: string;
 }
 
-export async function humanizeJob(description: string, title: string): Promise<AIResult<HumanizeResponse>> {
+export async function humanizeJob(
+  description: string,
+  title: string,
+  preExtracted?: Record<string, string | undefined>,
+): Promise<AIResult<HumanizeResponse>> {
   const res = await fetch(`${BASE}/ai/generate-summary`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ description, title }),
+    body: JSON.stringify({ description, title, preExtracted }),
   });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: 'AI request failed' }));
+    throw new ApiError(err.error || `HTTP ${res.status}`, res.status);
+  }
   const body = await res.json();
   return body;
 }
 
-export async function scrapeUrl(url: string): Promise<AIResult<{ title?: string; company?: string; description?: string; location?: string }>> {
+export async function scrapeUrl(url: string): Promise<AIResult<{
+  title?: string;
+  company?: string;
+  description?: string;
+  location?: string;
+  country?: string;
+  company_url?: string;
+  salary_range?: string;
+  employment_type?: string;
+  work_arrangement?: string;
+}>> {
   const res = await fetch(`${BASE}/ai/scrape-url`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ url }),
   });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: 'Scrape request failed' }));
+    throw new ApiError(err.error || `HTTP ${res.status}`, res.status);
+  }
   const body = await res.json();
   return body;
 }
@@ -112,13 +153,6 @@ export async function adminLogin(payload: AdminLoginPayload): Promise<AdminLogin
   return request('/auth/admin-login', {
     method: 'POST',
     body: JSON.stringify(payload),
-  });
-}
-
-export async function adminGoogleLogin(credential: string): Promise<AdminLoginResponse> {
-  return request('/auth/admin-login', {
-    method: 'POST',
-    body: JSON.stringify({ google_credential: credential }),
   });
 }
 

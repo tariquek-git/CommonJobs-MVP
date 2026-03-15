@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { adminLogin, adminGoogleLogin, getAdminJobs, updateJobStatus, getRuntime } from '../lib/api';
+import { adminLogin, getAdminJobs, updateJobStatus, getRuntime } from '../lib/api';
 import type { Job, RuntimeInfo } from '../lib/types';
 
 interface UseAdminReturn {
@@ -10,7 +10,6 @@ interface UseAdminReturn {
   error: string | null;
   statusFilter: string;
   login: (username: string, password: string) => Promise<void>;
-  loginWithGoogle: (credential: string) => Promise<void>;
   logout: () => void;
   setStatusFilter: (status: string) => void;
   changeJobStatus: (jobId: string, status: string) => Promise<void>;
@@ -36,21 +35,6 @@ export function useAdmin(): UseAdminReturn {
     setError(null);
     try {
       const { token: newToken } = await adminLogin({ username, password });
-      setToken(newToken);
-      sessionStorage.setItem('admin_token', newToken);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const loginWithGoogle = useCallback(async (credential: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { token: newToken } = await adminGoogleLogin(credential);
       setToken(newToken);
       sessionStorage.setItem('admin_token', newToken);
     } catch (err) {
@@ -122,7 +106,6 @@ export function useAdmin(): UseAdminReturn {
     error,
     statusFilter,
     login,
-    loginWithGoogle,
     logout,
     setStatusFilter,
     changeJobStatus,

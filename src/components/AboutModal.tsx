@@ -39,14 +39,14 @@ export default function AboutModal({ onClose }: AboutModalProps) {
         )}
 
         {/* Header — big, friendly, personal */}
-        <div className="relative bg-indigo-50 px-6 pt-6 pb-6">
+        <div className="relative bg-brand-50 px-6 pt-6 pb-6">
           <button onClick={onClose} className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/60 hover:bg-white/80 text-gray-500 transition-colors" aria-label="Close">
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
           <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-white shadow-sm text-2xl font-bold text-indigo-600 shrink-0">
+            <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-white shadow-sm text-2xl font-bold text-brand-500 shrink-0">
               TK
             </div>
             <div>
@@ -68,8 +68,8 @@ export default function AboutModal({ onClose }: AboutModalProps) {
           </div>
 
           {/* Why I built this */}
-          <div className="rounded-xl bg-indigo-50/50 border border-indigo-200/40 p-4">
-            <p className="text-xs font-semibold text-indigo-700 uppercase tracking-wider mb-2">Why I built this</p>
+          <div className="rounded-xl bg-brand-50/50 border border-brand-200/40 p-4">
+            <p className="text-xs font-semibold text-brand-700 uppercase tracking-wider mb-2">Why I built this</p>
             <p className="text-sm text-gray-600 leading-relaxed">
               After years in fintech, I got tired of watching good people apply into black holes. Fintech Commons is my attempt to make hiring feel more human — real roles, reviewed by a real person, with the option for a warm intro instead of a cold apply.
             </p>

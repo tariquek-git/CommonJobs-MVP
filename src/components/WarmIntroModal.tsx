@@ -129,8 +129,8 @@ export default function WarmIntroModal({ job, onClose }: WarmIntroModalProps) {
         <div className="p-6 border-b border-gray-200/60">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50">
-                <svg className="h-5 w-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50">
+                <svg className="h-5 w-5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                 </svg>
               </div>
@@ -150,18 +150,18 @@ export default function WarmIntroModal({ job, onClose }: WarmIntroModalProps) {
         {/* Body */}
         <div className="p-6 space-y-4">
           {/* How it works */}
-          <div className="rounded-xl bg-indigo-50/60 border border-indigo-200/60 p-4">
+          <div className="rounded-xl bg-brand-50/60 border border-brand-200/60 p-4">
             <div className="flex gap-3">
               <div className="shrink-0 mt-0.5">
-                <svg className="h-5 w-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <svg className="h-5 w-5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                 </svg>
               </div>
               <div className="space-y-1.5">
-                <p className="text-sm font-medium text-indigo-700">
+                <p className="text-sm font-medium text-brand-700">
                   I'll personally put your name in front of the right person.
                 </p>
-                <p className="text-xs text-indigo-600/80 leading-relaxed">
+                <p className="text-xs text-brand-500/80 leading-relaxed">
                   Not automated — I review each request and reach out to the job poster on your behalf. The poster opted in, so they're expecting it. Just be genuine — real interest, real profile.
                 </p>
                 <p className="text-xs text-gray-500 leading-relaxed">

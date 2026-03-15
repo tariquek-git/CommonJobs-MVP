@@ -25,8 +25,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let query = supabase
       .from(table)
       .select('*', { count: 'exact' })
-      .eq('status', 'active')
-      .eq('source_type', 'direct');
+      .eq('status', 'active');
 
     if (body.location) {
       query = query.ilike('location', `%${body.location}%`);
@@ -36,6 +35,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       query = query.overlaps('tags', body.tags);
     }
 
+    // Featured jobs always appear first, then sort by date
+    query = query.order('featured', { ascending: false, nullsFirst: false });
     query = query.order('posted_date', { ascending: sort === 'oldest' });
     query = query.range(offset, offset + limit - 1);
 

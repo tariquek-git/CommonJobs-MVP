@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
+import { usePostHog } from '@posthog/react';
 import Header from '../components/Header';
 import FounderSection from '../components/FounderSection';
 import FilterRail from '../components/FilterRail';
@@ -6,22 +7,56 @@ import JobGrid from '../components/JobGrid';
 import JobDetailModal from '../components/JobDetailModal';
 import SortStrip from '../components/SortStrip';
 import BottomNav from '../components/BottomNav';
-import TermsModal from '../components/TermsModal';
+import CircuitLines from '../components/CircuitLines';
 import { useJobs } from '../hooks/useJobs';
 import type { Job } from '../lib/types';
 
+const FintechGlobe = lazy(() => import('../components/FintechGlobe'));
+
 export default function HomePage() {
+  const posthog = usePostHog();
   const { jobs, meta, loading, error, sort, setSort, tags, setTags, refresh } = useJobs();
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
-  const [showTerms, setShowTerms] = useState(false);
+
+  useEffect(() => {
+    posthog?.capture('page_viewed', { page: 'home' });
+  }, [posthog]);
 
   return (
     <div className="min-h-screen bg-white">
-      <Header />
+      {/* Dark hero zone */}
+      <div className="relative overflow-hidden bg-navy-900">
+        {/* Warm gradient overlays */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99,91,255,0.3), transparent), radial-gradient(ellipse 60% 40% at 80% 50%, rgba(255,59,139,0.2), transparent), radial-gradient(ellipse 50% 30% at 20% 80%, rgba(255,107,0,0.15), transparent)'
+          }}
+        />
 
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6 pb-28 lg:pb-8 space-y-5">
-        <FounderSection />
+        {/* Animated globe */}
+        <div className="absolute right-[-10%] top-[-5%] w-[600px] h-[600px] opacity-30 lg:opacity-50 pointer-events-none">
+          <Suspense fallback={null}>
+            <FintechGlobe />
+          </Suspense>
+        </div>
 
+        <Header dark />
+
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6 pb-8">
+          <h1 className="text-hero text-white mb-2">
+            Fintech Commons Jobs<span className="gradient-text">:</span>
+          </h1>
+          <p className="text-lg text-white/75 max-w-xl mb-6">
+            Community-reviewed roles in fintech & banking. Real talk, warm intros.
+          </p>
+          <FounderSection dark />
+        </div>
+      </div>
+
+      {/* Light content zone */}
+      <main className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6 pb-28 lg:pb-8 space-y-5">
+        <CircuitLines />
         <SortStrip sort={sort} onSortChange={setSort} meta={meta} onRefresh={refresh} tags={tags} onTagsChange={setTags} />
 
         <div className="flex gap-8">
@@ -31,22 +66,10 @@ export default function HomePage() {
             <JobGrid jobs={jobs} loading={loading} error={error} onSelectJob={setSelectedJob} />
           </div>
         </div>
-
-        {/* Footer */}
-        <footer className="border-t border-gray-100 pt-4 pb-2 flex flex-wrap items-center justify-between gap-2 text-sm text-gray-600">
-          <p>Fintech Commons — a hobby project by Tarique Khan. Apache 2.0.</p>
-          <button
-            onClick={() => setShowTerms(true)}
-            className="hover:text-indigo-600 transition-colors underline underline-offset-2"
-          >
-            Terms & Conditions
-          </button>
-        </footer>
       </main>
 
       <BottomNav />
       <JobDetailModal job={selectedJob} onClose={() => setSelectedJob(null)} />
-      {showTerms && <TermsModal onClose={() => setShowTerms(false)} />}
     </div>
   );
 }

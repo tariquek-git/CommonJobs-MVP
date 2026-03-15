@@ -31,7 +31,7 @@ export default function FilterRail({ sort, onSortChange, meta, tags, onTagsChang
                 onClick={() => onSortChange(option)}
                 className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors duration-200 ${
                   sort === option
-                    ? 'bg-indigo-50 text-indigo-600 font-semibold'
+                    ? 'bg-brand-50 text-brand-500 font-semibold'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
@@ -50,7 +50,7 @@ export default function FilterRail({ sort, onSortChange, meta, tags, onTagsChang
                 onClick={() => toggleTag(cat)}
                 className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors duration-200 ${
                   tags.includes(cat)
-                    ? 'bg-indigo-50 text-indigo-600 font-semibold'
+                    ? 'bg-brand-50 text-brand-500 font-semibold'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
@@ -71,7 +71,7 @@ export default function FilterRail({ sort, onSortChange, meta, tags, onTagsChang
         {meta && (
           <div className="surface-tinted p-4">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Feed Info</h3>
-            <p className="text-sm text-gray-700 font-bold text-indigo-600">
+            <p className="text-sm text-gray-700 font-bold text-brand-500">
               {roleCount} {meta.total === 1 ? 'role' : 'roles'}
             </p>
           </div>

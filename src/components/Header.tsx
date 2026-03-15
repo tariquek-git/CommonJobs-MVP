@@ -4,10 +4,16 @@ import { APP_NAME } from '../lib/constants';
 import { useScrolled } from '../hooks/useScrolled';
 import AboutModal from './AboutModal';
 
-export default function Header() {
+interface HeaderProps {
+  dark?: boolean;
+}
+
+export default function Header({ dark = false }: HeaderProps) {
   const location = useLocation();
   const [showAbout, setShowAbout] = useState(false);
   const scrolled = useScrolled(10);
+
+  const onDark = dark && !scrolled;
 
   return (
     <>
@@ -15,19 +21,25 @@ export default function Header() {
         className={`sticky top-0 z-50 transition-all duration-300 ${
           scrolled
             ? 'bg-white/90 backdrop-blur-xl shadow-sm shadow-gray-900/[0.04] border-b border-gray-200/60'
-            : 'bg-white/80 backdrop-blur-xl border-b border-gray-200/60'
+            : dark
+              ? 'bg-transparent backdrop-blur-sm border-b border-white/10'
+              : 'bg-white/80 backdrop-blur-xl border-b border-gray-200/60'
         }`}
       >
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-500 font-bold text-white text-sm shadow-sm">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-accent-pink font-bold text-white text-sm shadow-sm">
               FC
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-bold tracking-tight text-gray-900 group-hover:text-indigo-600 transition-colors leading-tight">
+              <span className={`text-2xl font-bold tracking-tight transition-colors leading-tight ${
+                onDark ? 'text-white group-hover:text-accent-pink' : 'text-gray-900 group-hover:text-brand-500'
+              }`}>
                 {APP_NAME}
               </span>
-              <span className="text-sm text-gray-600 leading-tight hidden sm:block">
+              <span className={`text-sm leading-tight hidden sm:block ${
+                onDark ? 'text-white/75' : 'text-gray-600'
+              }`}>
                 Jobs — Fintech & Banking
               </span>
             </div>
@@ -36,16 +48,24 @@ export default function Header() {
           <nav className="flex items-center gap-1">
             <Link
               to="/"
-              className={`btn-ghost px-4 ${location.pathname === '/' ? 'text-gray-900 bg-gray-100/80' : ''}`}
+              className={`btn-ghost px-4 ${
+                onDark
+                  ? (location.pathname === '/' ? 'text-white bg-white/10' : 'text-white/70 hover:text-white hover:bg-white/10')
+                  : (location.pathname === '/' ? 'text-gray-900 bg-gray-100/80' : '')
+              }`}
             >
               Jobs
             </Link>
             <button
               onClick={() => setShowAbout(true)}
-              className="btn-ghost px-4 flex items-center gap-1.5"
+              className={`btn-ghost px-4 flex items-center gap-1.5 ${
+                onDark ? 'text-white/70 hover:text-white hover:bg-white/10' : ''
+              }`}
               title="About Tarique"
             >
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 text-[10px] font-bold text-indigo-600">
+              <div className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold ${
+                onDark ? 'bg-white/20 text-white' : 'bg-brand-50 text-brand-500'
+              }`}>
                 TK
               </div>
               <span className="hidden sm:inline text-sm">About</span>

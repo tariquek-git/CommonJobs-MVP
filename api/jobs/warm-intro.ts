@@ -83,12 +83,12 @@ async function sendAdminNotification(
   message?: string,
   introId?: string,
 ) {
-  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || 'tariquek@gmail.com';
+  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
 
   try {
     const { Resend } = await import('resend');
     const key = process.env.RESEND_API_KEY;
-    if (!key) return;
+    if (!key || !adminEmail) return;
 
     const resend = new Resend(key);
     const { data: job } = await supabase

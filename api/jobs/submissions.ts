@@ -5,6 +5,15 @@ import type { SubmissionPayload, SubmissionResponse } from '../../shared/types.j
 import { getClientIP, rateLimitOrReject, RATE_LIMITS } from '../../lib/rate-limit.js';
 import { createHash } from 'crypto';
 
+function escHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 function generateRefId(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const prefix = 'CJ';
@@ -86,6 +95,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       tags: payload.tags || [],
       standout_perks: payload.standout_perks || [],
       warm_intro_ok: payload.warm_intro_ok ?? true,
+      salary_range: payload.salary_range || null,
+      employment_type: payload.employment_type || null,
+      work_arrangement: payload.work_arrangement || null,
       submitter_ip_hash: ipHash,
       submitter_user_agent: userAgent,
       submitter_referrer: referrer,
@@ -116,8 +128,8 @@ async function notifyAdmin(payload: SubmissionPayload, ref: string, jobId?: stri
   try {
     const { Resend } = await import('resend');
     const key = process.env.RESEND_API_KEY;
-    const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || 'tariquek@gmail.com';
-    if (!key) return;
+    const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
+    if (!key || !adminEmail) return;
 
     const resend = new Resend(key);
     const subject = `New Submission: ${payload.title} at ${payload.company} [${ref}]`;
@@ -129,11 +141,11 @@ async function notifyAdmin(payload: SubmissionPayload, ref: string, jobId?: stri
       html: `
         <div style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px;">
           <h2 style="color: #0A1628; margin-bottom: 8px;">New Job Submission</h2>
-          <p style="color: #64748B; font-size: 15px;"><strong>Ref:</strong> ${ref}</p>
-          <p style="color: #64748B; font-size: 15px;"><strong>Title:</strong> ${payload.title}</p>
-          <p style="color: #64748B; font-size: 15px;"><strong>Company:</strong> ${payload.company}</p>
-          ${payload.location ? `<p style="color: #64748B; font-size: 15px;"><strong>Location:</strong> ${payload.location}</p>` : ''}
-          ${payload.submitter_name ? `<p style="color: #64748B; font-size: 15px;"><strong>Submitted by:</strong> ${payload.submitter_name} (${payload.submitter_email || 'no email'})</p>` : ''}
+          <p style="color: #64748B; font-size: 15px;"><strong>Ref:</strong> ${escHtml(ref)}</p>
+          <p style="color: #64748B; font-size: 15px;"><strong>Title:</strong> ${escHtml(payload.title)}</p>
+          <p style="color: #64748B; font-size: 15px;"><strong>Company:</strong> ${escHtml(payload.company)}</p>
+          ${payload.location ? `<p style="color: #64748B; font-size: 15px;"><strong>Location:</strong> ${escHtml(payload.location)}</p>` : ''}
+          ${payload.submitter_name ? `<p style="color: #64748B; font-size: 15px;"><strong>Submitted by:</strong> ${escHtml(payload.submitter_name)} (${escHtml(payload.submitter_email || 'no email')})</p>` : ''}
           ${payload.warm_intro_ok ? '<p style="color: #059669; font-size: 15px;">✅ Warm intros enabled</p>' : '<p style="color: #9CA3AF; font-size: 15px;">❌ Warm intros disabled</p>'}
           <hr style="border: none; border-top: 1px solid #E2E8F0; margin: 16px 0;" />
           <p style="color: #94A3B8; font-size: 13px;">Review in admin panel → /admin</p>
@@ -163,7 +175,7 @@ async function notifyAdmin(payload: SubmissionPayload, ref: string, jobId?: stri
       const sb = getSupabase();
       await sb.from('email_logs').insert({
         event_type: 'submission_notification',
-        recipient: process.env.ADMIN_NOTIFICATION_EMAIL || 'tariquek@gmail.com',
+        recipient: process.env.ADMIN_NOTIFICATION_EMAIL,
         subject: `New Submission: ${payload.title} at ${payload.company}`,
         status: 'failed',
         error_message: err instanceof Error ? err.message : 'Unknown error',

@@ -27,6 +27,11 @@ export interface Job {
   standout_perks: string[];
   warm_intro_ok: boolean;
   expires_at: string | null;
+  salary_range: string | null;
+  employment_type: string | null;
+  work_arrangement: string | null;
+  featured: boolean;
+  view_count: number;
 }
 
 // ── API Request/Response Types ──
@@ -64,6 +69,9 @@ export interface SubmissionPayload {
   tags?: string[];
   standout_perks?: string[];
   warm_intro_ok?: boolean;
+  salary_range?: string;
+  employment_type?: string;
+  work_arrangement?: string;
   submitter_name?: string;
   submitter_email?: string;
   // Honeypot - should be empty
@@ -85,6 +93,7 @@ export interface ClickPayload {
 export interface AIResult<T = string> {
   result: T;
   fallback: boolean;
+  error_type?: 'timeout' | 'api_error';
 }
 
 // ── Admin Types ──
@@ -92,7 +101,6 @@ export interface AIResult<T = string> {
 export interface AdminLoginPayload {
   username?: string;
   password?: string;
-  google_credential?: string;
 }
 
 export interface AdminLoginResponse {

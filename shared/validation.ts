@@ -6,7 +6,7 @@ export interface ValidationResult {
 }
 
 // Require HTTPS, valid domain with TLD of 2+ chars, no IP-only URLs
-const URL_PATTERN = /^https:\/\/[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}(\/.*)?$/;
+const URL_PATTERN = /^https?:\/\/[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}(\/.*)?$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_TITLE_LENGTH = 200;
 const MAX_COMPANY_LENGTH = 150;

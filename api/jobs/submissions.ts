@@ -24,6 +24,18 @@ function generateRefId(): string {
   return `${prefix}-${code}`;
 }
 
+function normalizeUrl(url: unknown): unknown {
+  if (!url || typeof url !== 'string' || !url.trim()) return url;
+  let u = url.trim();
+  if (!u.startsWith('https://') && !u.startsWith('http://')) {
+    u = 'https://' + u;
+  }
+  if (u.startsWith('http://')) {
+    u = 'https://' + u.slice(7);
+  }
+  return u;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed', code: 'METHOD_NOT_ALLOWED' });
@@ -33,6 +45,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (rateLimitOrReject(ip, RATE_LIMITS.submission, res)) return;
 
   try {
+    // Normalize URLs before validation
+    if (req.body && typeof req.body === 'object') {
+      req.body.apply_url = normalizeUrl(req.body.apply_url);
+      req.body.company_url = normalizeUrl(req.body.company_url);
+    }
+
     // Validate
     const validation = validateSubmission(req.body);
 

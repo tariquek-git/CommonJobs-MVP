@@ -24,6 +24,8 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <Header dark />
+
       {/* Dark hero zone */}
       <div className="relative overflow-hidden bg-navy-900">
         {/* Warm gradient overlays */}
@@ -40,8 +42,6 @@ export default function HomePage() {
             <FintechGlobe />
           </Suspense>
         </div>
-
-        <Header dark />
 
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6 pb-8">
           <h1 className="text-hero text-white mb-2">

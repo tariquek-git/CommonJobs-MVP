@@ -8,11 +8,13 @@ export const FEEDS = {
   },
 } as const;
 
-export const FOUNDER_TEXT = `Hi, it's Tarique 👋
+export const FOUNDER_TEXT = `Hi, I'm Tarique 👋
 
-I built Fintech Commons because I kept running into the same problem: job boards in fintech are broken. Ghost listings, black-hole applications, no way to know if a role is even real. I wanted to learn by building something that actually solves it.
+I work in Business Development at Brim Financial — we help banks, fintechs, and brands launch modern card and payment programs. It's where I spend my days, and it's how I ended up deep in this industry.
 
-The thesis is simple: automate what should be automated — posting, formatting, expiry, notifications — but keep the trust layer human. Real people post roles. A real person reviews them. And if you want a warm intro instead of a cold apply, a real human makes that connection.
+I built Fintech Commons because job boards in fintech are broken. Ghost listings, black-hole applications, no way to know if a role is even real. I wanted to build something that actually solves it.
 
-No algorithm decides what you see. No recruiter spam. Just roles that someone thought were worth sharing, translated from corporate-speak into plain language.`;
+The idea is simple: automate the plumbing — posting, formatting, expiry — but keep the trust layer human. Real people post roles. A real person reviews them. And if you want a warm intro instead of a cold apply, a real human makes that connection.
+
+Feel free to connect with me on LinkedIn or check out what we're building at Brim. Always happy to chat.`;
 

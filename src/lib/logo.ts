@@ -22,8 +22,14 @@ export function getLogoCandidates(companyUrl?: string | null, companyLogoUrl?: s
       // 2. Clearbit (high-quality logos, may fail for smaller companies)
       urls.push(`https://logo.clearbit.com/${hostname}`);
 
-      // 3. Google favicon service (reliable, works for most domains, up to 256px)
+      // 3. Favicon.im (multi-source fallback, apple-touch-icons up to 180px)
+      urls.push(`https://favicon.im/${hostname}?larger=true`);
+
+      // 4. Google favicon service (reliable, works for most domains)
       urls.push(`https://www.google.com/s2/favicons?domain=${hostname}&sz=128`);
+
+      // 5. Icon Horse (guaranteed fallback, never returns broken image)
+      urls.push(`https://icon.horse/icon/${hostname}`);
 
     } catch { /* invalid URL, skip */ }
   }

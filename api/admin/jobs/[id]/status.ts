@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { requireAdmin } from '../../../../lib/auth.js';
 import { getSupabase, getJobsTable } from '../../../../lib/supabase.js';
 import { sendApprovalEmail } from '../../../../lib/email.js';
+import { humanizeJobPost } from '../../../../lib/ai.js';
 import type { JobStatus, Job } from '../../../../shared/types.js';
 
 const VALID_STATUSES: JobStatus[] = ['pending', 'active', 'rejected', 'archived'];
@@ -30,9 +31,47 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const supabase = getSupabase();
+
+    // Fetch current job data first
+    const { data: currentJob, error: fetchError } = await supabase
+      .from(getJobsTable())
+      .select()
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !currentJob) {
+      return res.status(404).json({ error: 'Job not found', code: 'NOT_FOUND' });
+    }
+
+    const job = currentJob as Job;
+    const updates: Record<string, unknown> = { status, updated_at: new Date().toISOString() };
+
+    // Auto-generate AI summary when approving a job that has no summary
+    if (status === 'active' && !job.summary && job.description) {
+      const aiResult = await humanizeJobPost(job.description, job.title, {
+        company: job.company,
+        location: job.location || undefined,
+        country: job.country || undefined,
+        company_url: job.company_url || undefined,
+      });
+
+      if (!aiResult.fallback && aiResult.result.humanized_description) {
+        updates.summary = aiResult.result.humanized_description;
+        if (aiResult.result.standout_perks?.length) {
+          updates.standout_perks = aiResult.result.standout_perks;
+        }
+        // Fill in any missing metadata from AI
+        if (!job.location && aiResult.result.location) updates.location = aiResult.result.location;
+        if (!job.country && aiResult.result.country) updates.country = aiResult.result.country;
+        if (!job.salary_range && aiResult.result.salary_range) updates.salary_range = aiResult.result.salary_range;
+        if (!job.employment_type && aiResult.result.employment_type) updates.employment_type = aiResult.result.employment_type;
+        if (!job.work_arrangement && aiResult.result.work_arrangement) updates.work_arrangement = aiResult.result.work_arrangement;
+      }
+    }
+
     const { data, error } = await supabase
       .from(getJobsTable())
-      .update({ status, updated_at: new Date().toISOString() })
+      .update(updates)
       .eq('id', id)
       .select()
       .single();

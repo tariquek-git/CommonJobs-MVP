@@ -50,8 +50,8 @@ export default function AboutModal({ onClose }: AboutModalProps) {
               TK
             </div>
             <div>
-              <h3 id="about-modal-title" className="text-xl font-bold text-gray-900">Hey, I'm Tarique</h3>
-              <p className="text-sm text-gray-600 mt-0.5">I built Fintech Commons — and here's why.</p>
+              <h3 id="about-modal-title" className="text-xl font-bold text-gray-900">Hey, I'm Tarique 👋</h3>
+              <p className="text-sm text-gray-600 mt-0.5">Feel free to connect — always happy to chat.</p>
             </div>
           </div>
         </div>
@@ -63,7 +63,7 @@ export default function AboutModal({ onClose }: AboutModalProps) {
           <div className="rounded-xl bg-gray-50 border border-gray-200/60 p-4">
             <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">What I do</p>
             <p className="text-sm text-gray-700 leading-relaxed">
-              By day, I'm in Business Development at <span className="font-medium">Brim Financial</span> — helping banks, fintechs, and non-FIs launch modern card and payment programs. If you've tapped a card recently, there's a decent chance I had something to do with the plumbing behind it.
+              I work in Business Development at <a href="https://www.brimfinancial.com" target="_blank" rel="noopener noreferrer" className="font-medium text-brand-500 hover:text-brand-600">Brim Financial</a> — we help banks, fintechs, and brands launch modern card and payment programs. Brim is one of Canada's fastest-growing fintech platforms, powering credit, prepaid, and loyalty programs for some of the biggest names in the space.
             </p>
           </div>
 

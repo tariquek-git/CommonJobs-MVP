@@ -27,18 +27,19 @@ export default function CompanyLogo({ companyName, companyUrl, companyLogoUrl, s
   }
 
   return (
-    <>
-      <img
-        src={currentUrl}
-        alt={`${companyName} logo`}
-        loading="lazy"
-        className={`${sizeClasses} rounded-xl object-contain bg-gray-100 p-1.5`}
-        onError={() => {
-          // Try next candidate
+    <img
+      src={currentUrl}
+      alt={`${companyName} logo`}
+      loading="lazy"
+      className={`${sizeClasses} rounded-xl object-contain bg-gray-100 p-1.5`}
+      onError={() => setCandidateIndex((i) => i + 1)}
+      onLoad={(e) => {
+        const img = e.target as HTMLImageElement;
+        // Skip tiny placeholder images (1x1 tracking pixels, etc.)
+        if (img.naturalWidth < 16 || img.naturalHeight < 16) {
           setCandidateIndex((i) => i + 1);
-        }}
-      />
-      {/* Hidden fallback in case all images fail — shown when img has display:none wouldn't work with state approach */}
-    </>
+        }
+      }}
+    />
   );
 }

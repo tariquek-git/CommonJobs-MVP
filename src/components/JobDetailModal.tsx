@@ -70,16 +70,30 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
       has_warm_intro: job.warm_intro_ok,
     });
 
+    // Update URL so the address bar is shareable
+    const previousUrl = window.location.pathname + window.location.search;
+    window.history.pushState({ jobModal: true }, '', `/job/${job.id}`);
+
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
 
+    const handlePopState = () => {
+      onClose();
+    };
+
     document.addEventListener('keydown', handleEsc);
+    window.addEventListener('popstate', handlePopState);
     document.body.style.overflow = 'hidden';
 
     return () => {
       document.removeEventListener('keydown', handleEsc);
+      window.removeEventListener('popstate', handlePopState);
       document.body.style.overflow = '';
+      // Restore previous URL when modal closes (unless browser back was used)
+      if (window.location.pathname === `/job/${job.id}`) {
+        window.history.replaceState(null, '', previousUrl);
+      }
     };
   }, [job, onClose]);
 
@@ -326,21 +340,49 @@ export default function JobDetailModal({ job, onClose }: JobDetailModalProps) {
 
           {/* Footer */}
           <div className="flex items-center justify-between p-6 border-t border-gray-200/60 bg-gray-50/50">
-            <button
-              onClick={handleShare}
-              className="relative rounded-full p-2.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 transition-colors"
-              aria-label="Share job"
-              title="Share"
-            >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
-              </svg>
-              {showCopied && (
-                <span className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2.5 py-1 text-xs text-white shadow-lg animate-fade-in">
-                  Link copied!
-                </span>
-              )}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleShare}
+                className="relative rounded-full p-2.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 transition-colors"
+                aria-label="Share job"
+                title="Share"
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+                </svg>
+                {showCopied && (
+                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2.5 py-1 text-xs text-white shadow-lg animate-fade-in">
+                    Link copied!
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={async () => {
+                  const url = `${window.location.origin}/job/${job.id}`;
+                  try {
+                    await navigator.clipboard.writeText(url);
+                  } catch {
+                    const ta = document.createElement('textarea');
+                    ta.value = url;
+                    ta.style.position = 'fixed';
+                    ta.style.opacity = '0';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                  }
+                  posthog?.capture('job_link_copied', { job_id: job.id, job_title: job.title });
+                  setShowCopied(true);
+                  setTimeout(() => setShowCopied(false), 2000);
+                }}
+                className="btn-secondary text-xs py-1.5 px-3"
+              >
+                <svg className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-2.04a4.5 4.5 0 00-1.242-7.244l-4.5-4.5a4.5 4.5 0 00-6.364 6.364L4.757 8.82" />
+                </svg>
+                Copy Link
+              </button>
+            </div>
             <div className="flex items-center gap-3">
             <button onClick={onClose} className="btn-secondary">
               Close
